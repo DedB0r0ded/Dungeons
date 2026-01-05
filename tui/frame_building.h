@@ -3,98 +3,104 @@
 
 #include "tui_matrixes.h"
 #include "char_styling.h"
+#include "StyleStack.h"
 
 
 namespace dungeons::tui {
 
 
     class StylePicker {
-        std::stack<CharStyle> style_stack_;
-        CharStyle current_style_;
+        StyleStack styles_;
+        CharStyle current_;
+        size_t current_repeats_;
 
-    public:
-        StylePicker() = default;
-        explicit StylePicker(const CharStyle& initial_style) : current_style_(initial_style) {}
-
-        void push_style() {
-            style_stack_.push(current_style_);
+        void push_style(const CharStyle& value) {
+            if (value == current_) {
+                current_repeats_++;
+                return;
+            }
+            styles_.push(current_);
+            current_ = value;
         }
 
         Result<void> pop_style() {
-            if (style_stack_.empty()) {
-                return Err(ErrorCode::EMPTY_CONTAINER, "Cannot pop from empty style stack");
+            if (current_repeats_ > 0) {
+                current_repeats_--;
+                return Ok();
             }
-            current_style_ = style_stack_.top();
-            style_stack_.pop();
-            return Ok();
+            return styles_.pop();
         }
 
-        Result<void> pop_styles(size_t count) {
-            if (count > style_stack_.size()) {
-                return Err(ErrorCode::OUT_OF_RANGE,
-                    "Cannot pop " + std::to_string(count) + " styles, only " +
-                    std::to_string(style_stack_.size()) + " available");
-            }
-            for (size_t i = 0; i < count; ++i) {
-                current_style_ = style_stack_.top();
-                style_stack_.pop();
-            }
-            return Ok();
-        }
+    public:
+        StylePicker() = default;
+        explicit StylePicker(const CharStyle& initial_style) : current_(initial_style), current_repeats_{0} {}
 
-        Result<void> apply_operations(StyleOperation operations, const CharStyle new_style) {
-            CharStyleBuilder builder(current_style_);
+
+        Result<void> apply_style(const CharStyle new_style, StyleOperation operations = StyleOperation::NONE) {
+            CharStyle style = CharStyle(current_);
+            #ifdef DNG_EXPERIMENTAL // Функционал с частичным применением стилей не реализован до конца. Поэтому отмечен как экспериментальный.
+            if (has_operation(operations, StyleOperation::RESET_STYLE)) {
+                reset();
+                return Ok();
+            }
             if (has_operation(operations, StyleOperation::SET_FG_COLOR)) {
-                builder.set_fg_color(new_style.fg_color)
-                    .set_fg_ansi(new_style.fg_ansi)
-                    .set_fg_rgb(new_style.fg_r, new_style.fg_g, new_style.fg_b);
+                style.fg_color = new_style.fg_color;
+                style.fg_ansi = new_style.fg_ansi;
+                style.fg_r = new_style.fg_r;
+                style.fg_g = new_style.fg_g;
+                style.fg_b = new_style.fg_b;
             }
             if (has_operation(operations, StyleOperation::SET_BG_COLOR)) {
-                builder.set_bg_color(new_style.bg_color)
-                    .set_bg_ansi(new_style.bg_ansi)
-                    .set_bg_rgb(new_style.bg_r, new_style.bg_g, new_style.bg_b);
+                style.bg_color = new_style.bg_color;
+                style.bg_ansi = new_style.bg_ansi;
+                style.bg_r = new_style.bg_r;
+                style.bg_g = new_style.bg_g;
+                style.bg_b = new_style.bg_b;
             }
             if (has_operation(operations, StyleOperation::SET_STYLE)) {
-                builder.set_style(new_style.style);
+                style.style = new_style.style;
             }
-            if (has_operation(operations, StyleOperation::RESET_STYLE)) {
-                auto pop_result = pop_style();
-                if (!pop_result)
-                    return pop_result;
-            }
-            else {
-                auto result = builder.build();
-                if (!result) {
-                    return Err(result.error().code(), result.error().message());
-                }  
-                current_style_ = result.value();
-            }
+            #else
+            style.fg_color = new_style.fg_color;
+            style.fg_ansi = new_style.fg_ansi;
+            style.fg_r = new_style.fg_r;
+            style.fg_g = new_style.fg_g;
+            style.fg_b = new_style.fg_b;
+            style.bg_color = new_style.bg_color;
+            style.bg_ansi = new_style.bg_ansi;
+            style.bg_r = new_style.bg_r;
+            style.bg_g = new_style.bg_g;
+            style.bg_b = new_style.bg_b;
+            style.style = new_style.style;
+            #endif
+            push_style(style);
             return Ok();
         }
 
-        const CharStyle& current_style() const noexcept {
-            return current_style_;
+        const CharStyle& current() const noexcept {
+            return current_;
         }
 
-        std::string get_style_string() const {
-            return CharStyleBuilder(current_style_).to_string();
+        std::string current_as_string() const {
+            return CharStyleStringBuilder(current_).to_string();
         }
 
-        void reset() noexcept {
-            current_style_ = CharStyle();
-            while (!style_stack_.empty()) {
-                style_stack_.pop();
-            }
+        Result<void> reset() {
+            auto peek_res = styles_.peek_basic();
+            if (!peek_res)
+                return Result<void>(peek_res.error());
+            current_ = peek_res.value();
+            styles_.clear();
         }
 
-        size_t stack_size() const noexcept {
-            return style_stack_.size();
+        size_t size() const noexcept {
+            return styles_.size();
         }
     };
 
 
     class FrameSnapshot {
-        StylePicker applicator_;
+        StylePicker picker_;
         size_t rows_;
         size_t cols_;
 

@@ -25,13 +25,13 @@ namespace dungeons::tui {
 		const StyleStack& operator=(StyleStack&&) = delete;
 		~StyleStack() = default;
 
-		Result<CharStyle> peek_basic() {
+		Result<CharStyle> peek_basic() const {
 			if (container_.empty())
 				return Err<CharStyle>(ErrorCode::OUT_OF_RANGE, "Style stack was empty.");
 			return Ok(container_.back());
 		}
 
-		Result<CharStyle> peek() {
+		Result<CharStyle> peek() const {
 			if (container_.empty())
 				return Err<CharStyle>(ErrorCode::OUT_OF_RANGE, "Style stack was empty.");
 			return Ok(container_.front());
@@ -48,12 +48,16 @@ namespace dungeons::tui {
 			return Ok();
 		}
 
-		bool empty() {
+		bool empty() const {
 			return container_.empty();
 		}
 
-		size_t size() {
+		size_t size() const {
 			return container_.size();
+		}
+
+		void clear() {
+			container_.clear();
 		}
 	};
 
