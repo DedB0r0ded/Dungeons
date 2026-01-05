@@ -56,7 +56,7 @@ add_executable(DungeonsTests
     "tests/time_test.cpp" 
     "tests/uid_test.cpp"
     "tests/test_main.cpp" 
- "tests/result_test.cpp" "tests/test_style_stack.cpp")
+ "tests/result_test.cpp" "tests/style_stack_test.cpp" "tests/char_styling_test.cpp")
 target_link_libraries(DungeonsTests 
   GTest::gtest_main 
   nlohmann_json::nlohmann_json 

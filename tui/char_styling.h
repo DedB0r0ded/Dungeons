@@ -27,7 +27,7 @@ namespace dungeons::tui {
             CharStyle(other.fg_color, other.fg_ansi, other.fg_r, other.fg_g, other.fg_b,
                 other.bg_color, other.bg_ansi, other.bg_r, other.bg_g, other.bg_b, other.style) { }
 
-        CharStyle(CharStyle&& other) :
+        explicit CharStyle(CharStyle&& other) noexcept :
             CharStyle(other.fg_color, other.fg_ansi, other.fg_r, other.fg_g, other.fg_b,
                 other.bg_color, other.bg_ansi, other.bg_r, other.bg_g, other.bg_b, other.style) {
             other.reset();
