@@ -13,7 +13,8 @@ namespace dungeons {
         OUT_OF_RANGE,
         EMPTY_CONTAINER,
         VALIDATION_FAILED,
-        INVALID_DIMENSIONS
+        INVALID_DIMENSIONS,
+        NOT_IMPLEMENTED
     };
 
 
@@ -22,7 +23,7 @@ namespace dungeons {
         std::string message_;
 
     public:
-        constexpr Error() noexcept : code_(ErrorCode::OK) {}
+        Error() noexcept : code_(ErrorCode::OK) {}
 
         Error(ErrorCode code, std::string message)
             : code_(code), message_(std::move(message)) {
@@ -128,8 +129,6 @@ namespace dungeons {
         return Result<T>(std::move(value));
     }
 
-
-
     inline Result<void> Ok() {
         return Result<void>();
     }
@@ -141,5 +140,14 @@ namespace dungeons {
 
     inline Result<void> Err(ErrorCode code, std::string message) {
         return Result<void>(Error(code, std::move(message)));
+    }
+
+    template<typename T>
+    Result<T> Err() {
+        return Result<T>(Error(ErrorCode::NOT_IMPLEMENTED, "This method or class is yet to be implemented."));
+    }
+
+    inline Result<void> Err() {
+        return Result<void>(Error(ErrorCode::NOT_IMPLEMENTED, "This method or class is yet to be implemented."));
     }
 }

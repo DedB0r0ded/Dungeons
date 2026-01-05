@@ -16,20 +16,34 @@ namespace dungeons::tui {
         int bg_ansi;
         int bg_r, bg_g, bg_b;
 
-        int fg_style;
+        StyleFlags style;
 
         // Конструкторы
-        constexpr CharStyle()
-            : fg_color(Color::WHITE), fg_ansi(0), fg_r(255), fg_g(255), fg_b(255),
-            bg_color(Color::BLACK), bg_ansi(0), bg_r(0), bg_g(0), bg_b(0),
-            fg_style(static_cast<int>(TextStyle::NONE)) {
+        constexpr CharStyle(Color fg_color, int fg_ansi, int fg_r, int fg_g, int fg_b, Color bg_color, int bg_ansi, int bg_r, int bg_g, int bg_b, StyleFlags style)
+            noexcept : fg_color{ fg_color }, fg_ansi{ fg_ansi }, fg_r{ fg_r }, fg_g{ fg_g }, fg_b{ fg_b },
+            bg_color{ bg_color }, bg_ansi{ bg_ansi }, bg_r{ bg_r }, bg_g{ bg_g }, bg_b { bg_b }, style{ style } { }
+
+        CharStyle(const CharStyle& other) : 
+            CharStyle(other.fg_color, other.fg_ansi, other.fg_r, other.fg_g, other.fg_b,
+                other.bg_color, other.bg_ansi, other.bg_r, other.bg_g, other.bg_b, other.style) { }
+
+        CharStyle(CharStyle&& other) :
+            CharStyle(other.fg_color, other.fg_ansi, other.fg_r, other.fg_g, other.fg_b,
+                other.bg_color, other.bg_ansi, other.bg_r, other.bg_g, other.bg_b, other.style) {
+            other.reset();
         }
 
-        constexpr CharStyle(Color fg, Color bg, int style = static_cast<int>(TextStyle::NONE))
-            : fg_color(fg), fg_ansi(0), fg_r(255), fg_g(255), fg_b(255),
-            bg_color(bg), bg_ansi(0), bg_r(0), bg_g(0), bg_b(0),
-            fg_style(style) {
-        }
+        constexpr CharStyle()
+            : CharStyle(Color::BLACK, 0, 0, 0, 0, Color::WHITE, 0, 0, 0, 0, StyleFlags::NONE) { }
+
+        constexpr CharStyle(Color fg, Color bg, StyleFlags style = StyleFlags::NONE)
+            : CharStyle(fg, 0, 0, 0, 0, bg, 0, 0, 0, 0, style) { }
+
+        constexpr CharStyle(int fg, int bg, StyleFlags style = StyleFlags::NONE)
+            : CharStyle(Color::ANSI8, fg, 0, 0, 0, Color::ANSI8, bg, 0, 0, 0, style) { }
+
+        constexpr CharStyle(int fr, int fg, int fb, int br, int bg, int bb, StyleFlags style = StyleFlags::NONE)
+            : CharStyle(Color::RGB, 0, fr, fg, fb, Color::RGB, 0, br, bg, bb, style) { }
 
         // Операторы сравнения
         constexpr bool operator==(const CharStyle& other) const noexcept {
@@ -37,7 +51,7 @@ namespace dungeons::tui {
                 return false;
             if (bg_color != other.bg_color)
                 return false;
-            if (fg_style != other.fg_style)
+            if (style != other.style)
                 return false;
             if (fg_ansi != other.fg_ansi || bg_ansi != other.bg_ansi)
                 return false;
@@ -48,6 +62,23 @@ namespace dungeons::tui {
         constexpr bool operator!=(const CharStyle& other) const noexcept {
             return !(*this == other);
         }
+
+        CharStyle& operator=(const CharStyle& other) noexcept {
+            if (*this == other)
+                return *this;
+            bg_color = other.bg_color;
+            fg_color = other.fg_color;
+            bg_ansi = other.bg_ansi;
+            fg_ansi = other.fg_ansi;
+            bg_r = other.bg_r;
+            bg_g = other.bg_g;
+            bg_b = other.bg_b;
+            fg_r = other.fg_r;
+            fg_g = other.fg_g;
+            fg_b = other.fg_b;
+            style = other.style;
+        }
+
 
         // Валидация
         Result<void> validate() const noexcept {
@@ -72,6 +103,14 @@ namespace dungeons::tui {
 
         bool is_valid() const noexcept {
             return validate().is_ok();
+        }
+
+        void reset() {
+            fg_color = Color::BLACK;
+            bg_color = Color::WHITE;
+            fg_ansi = fg_r = fg_g = fg_b = 0;
+            bg_ansi = bg_r = bg_g = bg_b = 0;
+            style = StyleFlags::NONE;
         }
     };
 
@@ -125,69 +164,60 @@ namespace dungeons::tui {
 
 
     public:
-        CharStyleStringBuilder() = default;
-        explicit CharStyleStringBuilder(const CharStyle& style) : value_(style) {}
-
-
-        Result<CharStyle> build() const noexcept {
-            auto validation = value_.validate();
-            if (!validation) {
-                return Err<CharStyle>(validation.error().code(), validation.error().message());
-            }
-            return Ok(value_);
+        CharStyleStringBuilder() noexcept {
+            value_ = CharStyle();
         }
-
+        explicit CharStyleStringBuilder(const CharStyle& style) : value_(style) {}
 
         const CharStyle& get() const noexcept {
             return value_;
         }
-
 
         std::string to_string() const {
             std::ostringstream oss;
             oss << "\033[";
             bool need_separator = false;
             // Формируем стиль текста
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::BOLD)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::BOLD)) {
                 oss << "1";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::DIM)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::DIM)) {
                 if (need_separator) oss << ";";
                 oss << "2";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::ITALIC)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::ITALIC)) {
                 if (need_separator) oss << ";";
                 oss << "3";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::UNDERLINED)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::UNDERLINED)) {
                 if (need_separator) oss << ";";
                 oss << "4";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::BLINK_SLOW)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::BLINK_SLOW)) {
                 if (need_separator) oss << ";";
                 oss << "5";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::BLINK_FAST)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::BLINK_FAST)) {
                 if (need_separator) oss << ";";
                 oss << "6";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::INVERSE)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::INVERSE)) {
                 if (need_separator) oss << ";";
                 oss << "7";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::HIDDEN)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::HIDDEN)) {
                 if (need_separator) oss << ";";
                 oss << "8";
                 need_separator = true;
             }
-            if (has_style(static_cast<TextStyle>(value_.fg_style), TextStyle::STRIKE_THROUGH)) {
+            if (has_style(static_cast<StyleFlags>(value_.style), StyleFlags::STRIKE_THROUGH)) {
                 if (need_separator) oss << ";";
                 oss << "9";
                 need_separator = true;

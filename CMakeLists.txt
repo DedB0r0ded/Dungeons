@@ -27,7 +27,7 @@ add_executable(Dungeons
     "EventLoop.h"
     "Dungeons.h"
     "Dungeons.cpp"
- "result.h"  "tui/tui_base.h" "tui/char_styling.h" "tui/tui_matrixes.h")
+ "result.h"  "tui/tui_base.h" "tui/char_styling.h" "tui/tui_matrixes.h" "tui/StyleStack.h")
 
 set_target_properties(Dungeons PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(Dungeons PRIVATE nlohmann_json::nlohmann_json)
@@ -56,7 +56,7 @@ add_executable(DungeonsTests
     "tests/time_test.cpp" 
     "tests/uid_test.cpp"
     "tests/test_main.cpp" 
-)
+ "tests/result_test.cpp" "tests/test_style_stack.cpp")
 target_link_libraries(DungeonsTests 
   GTest::gtest_main 
   nlohmann_json::nlohmann_json 

@@ -8,13 +8,13 @@
 namespace dungeons::tui {
 
 
-    class StyleApplicator {
+    class StylePicker {
         std::stack<CharStyle> style_stack_;
         CharStyle current_style_;
 
     public:
-        StyleApplicator() = default;
-        explicit StyleApplicator(const CharStyle& initial_style) : current_style_(initial_style) {}
+        StylePicker() = default;
+        explicit StylePicker(const CharStyle& initial_style) : current_style_(initial_style) {}
 
         void push_style() {
             style_stack_.push(current_style_);
@@ -42,8 +42,7 @@ namespace dungeons::tui {
             return Ok();
         }
 
-        Result<void> apply_operations(StyleOperation operations,
-            const CharStyle new_style) {
+        Result<void> apply_operations(StyleOperation operations, const CharStyle new_style) {
             CharStyleBuilder builder(current_style_);
             if (has_operation(operations, StyleOperation::SET_FG_COLOR)) {
                 builder.set_fg_color(new_style.fg_color)
@@ -56,7 +55,7 @@ namespace dungeons::tui {
                     .set_bg_rgb(new_style.bg_r, new_style.bg_g, new_style.bg_b);
             }
             if (has_operation(operations, StyleOperation::SET_STYLE)) {
-                builder.set_style(new_style.fg_style);
+                builder.set_style(new_style.style);
             }
             if (has_operation(operations, StyleOperation::RESET_STYLE)) {
                 auto pop_result = pop_style();
@@ -95,9 +94,7 @@ namespace dungeons::tui {
 
 
     class FrameSnapshot {
-        inline static const FrameChar fill_ = FrameChar(' ');
-        std::vector<std::vector<FrameChar>> chars_;
-        StyleApplicator applicator_;
+        StylePicker applicator_;
         size_t rows_;
         size_t cols_;
 
@@ -121,96 +118,48 @@ namespace dungeons::tui {
 
         // Методы доступа
         Result<void> set_chars(std::initializer_list<std::string_view> lines) {
-            if (lines.size() > rows_) {
-                return Err(ErrorCode::INVALID_ARGUMENT,
-                    "Number of lines (" + std::to_string(lines.size()) +
-                    ") exceeds number of rows (" + std::to_string(rows_) + ")");
-            }
-            size_t i = 0;
-            for (const auto& line : lines) {
-                if (line.size() > cols_) {
-                    std::fill(chars_[i].begin(), chars_[i].end(), fill_);
-                }
-                else {
-                    for (size_t j = 0; j < line.size(); j++) {
-                        chars_[i][j].value(line[j]);
-                    }
-                    std::fill(chars_[i].begin() + line.size(), chars_[i].end(), fill_);
-                }
-                i++;
-            }
-            for (; i < rows_; i++) {
-                std::fill(chars_[i].begin(), chars_[i].end(), fill_);
-            }
-            return Ok();
+            return Err();
         }
 
 
         std::string to_string() const {
             std::ostringstream result;
-            for (size_t i = 0; i < rows_; i++) {
-                for (size_t j = 0; j < cols_; j++) {
-                    const auto& ch = chars_[i][j];
-                    if (ch.has_operations()) {
-                        applicator.push_style();
-                        // Применяем все операции символа
-                        for (const auto& op : ch.operations()) {
-                            
-                        }
-                    }
-                    result << ch.value();
-                    if (ch.has_operations()) {
-                        auto pop_result = applicator.pop_style();
-                        if (pop_result) {
-                            result << applicator.get_style_string();
-                        }
-                    }
-                }
-                result << '\n';
-            }
+            
             return result.str();
         }
 
 
         // Доступ к символу для чтения. Возвращает копию.
-        Result<FrameChar> get_char(size_t row, size_t col) const {
-            auto validation = validate_position(row, col);
-            if (!validation) {
-                return Err<FrameChar>(validation.error().code(), validation.error().message());
-            }
-            FrameChar res = FrameChar(chars_[row][col]);
-            return Ok(res);
+        Result<char> get_char(size_t row, size_t col) const {
+            // validation
+            // get
+            // return code and char
+            return Err<char>();
         }
 
-        Result<void> set_char(size_t row, size_t col, const FrameChar& value) {
-            auto validation = validate_position(row, col);
-            if (!validation) {
-                return validation;
-            }
-            chars_[row][col] = value;
-            return Ok();
+        Result<void> set_char(size_t row, size_t col, const char value) {
+            // validation
+            // set
+            // return code
+            return Err();
         }
 
         Result<void> set_char(size_t row, size_t col, char value) {
-            auto validation = validate_position(row, col);
-            if (!validation) {
-                return validation;
-            }
-            chars_[row][col].value(value);
-            return Ok();
+            // validation
+            // set
+            // return code
+            return Err();
         }
 
         Result<void> set_default_style(const CharStyle& style) {
-            auto validation = style.validate();
-            if (!validation) {
-                return validation;
-            }
-            default_style_ = style;
-            return Ok();
+            // validation?
+            // set
+            // return code
+            return Err();
         }
 
-        const CharStyle& get_default_style() const noexcept {
-            return default_style_;
+        Result<const CharStyle&> get_default_style() const noexcept {
+            return Err<const CharStyle&>();
         }
 
         constexpr size_t rows() const noexcept { return rows_; }

@@ -58,7 +58,7 @@ namespace dungeons::tui {
     };
 
 
-    enum class TextStyle : int {
+    enum class StyleFlags : int {
         BOLD = 1 << 0,
         DIM = 1 << 1,
         ITALIC = 1 << 2,
@@ -72,14 +72,14 @@ namespace dungeons::tui {
     };
 
     // Побитовые операции для TextStyle
-    constexpr TextStyle operator|(TextStyle a, TextStyle b) noexcept {
-        return static_cast<TextStyle>(static_cast<int>(a) | static_cast<int>(b));
+    constexpr StyleFlags operator|(StyleFlags a, StyleFlags b) noexcept {
+        return static_cast<StyleFlags>(static_cast<int>(a) | static_cast<int>(b));
     }
-    constexpr TextStyle operator&(TextStyle a, TextStyle b) noexcept {
-        return static_cast<TextStyle>(static_cast<int>(a) & static_cast<int>(b));
+    constexpr StyleFlags operator&(StyleFlags a, StyleFlags b) noexcept {
+        return static_cast<StyleFlags>(static_cast<int>(a) & static_cast<int>(b));
     }
-    constexpr bool has_style(TextStyle styles, TextStyle style) noexcept {
-        return (styles & style) == style && style != TextStyle::NONE;
+    constexpr bool has_style(StyleFlags styles, StyleFlags style) noexcept {
+        return (styles & style) == style && style != StyleFlags::NONE;
     }
 
 
