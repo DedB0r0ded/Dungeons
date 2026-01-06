@@ -1,5 +1,5 @@
 #include "Dungeons.h"
-
+#include "tui/UnicodeCharMatrix.h"
 
 // Символы, чтобы заставить Windows сохранить исходный код в UTF-8.
 // Нужно для правильной работы библиотеки nlohmann::json.
@@ -23,8 +23,12 @@ int main()
 	auto t = dungeons::tui::BaseTerminal(std::cout);
 
 	t.put("\033[1;3;4;38;2;255;100;0;48;5;34m");
-
-	dungeons::Time a = dungeons::Time::now();
+	dungeons::tui::UnicodeCharMatrix matrix({ "АБВ", "ГДЕ", "ЁЖЗ" });
+	
+	auto ch = matrix.get_at(1, 1);
+	t.put(matrix.to_string());
+	t.putln(std::to_string(matrix.cols().value()));
+	dungeons::Time a = dungeons::Time::now().value();
 	//auto frame = dungeons::FrameSnapshot(10, 100);
 	//t.put(frame.to_string());
 	t.put("\033[0m");

@@ -60,13 +60,6 @@ namespace dungeons::tui {
             return Err();
         }
 
-        Result<void> set_char(size_t row, size_t col, char value) {
-            // validation
-            // set
-            // return code
-            return Err();
-        }
-
         Result<void> set_default_style(const CharStyle& style) {
             // validation?
             // set
@@ -74,8 +67,8 @@ namespace dungeons::tui {
             return Err();
         }
 
-        Result<const CharStyle&> get_default_style() const noexcept {
-            return Err<const CharStyle&>();
+        Result<CharStyle> get_default_style() const noexcept {
+            return Err<CharStyle>();
         }
 
         constexpr size_t rows() const noexcept { return rows_; }
