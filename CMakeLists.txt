@@ -8,6 +8,8 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+add_definitions(-DNOMINMAX)
+
 project ("Dungeons")
 
 # --- Добавляем nlohmann json - работа с JSON-форматом ---
@@ -27,7 +29,7 @@ add_executable(Dungeons
     "EventLoop.h"
     "Dungeons.h"
     "Dungeons.cpp"
- "result.h"  "tui/tui_base.h" "tui/char_styling.h" "tui/tui_matrixes.h" "tui/StyleStack.h")
+ "result.h"  "tui/tui_base.h" "tui/char_styling.h" "tui/StyleMatrix.h" "tui/StyleStack.h" "tui/RawCharMatrix.h" "tui/StylePicker.h")
 
 set_target_properties(Dungeons PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(Dungeons PRIVATE nlohmann_json::nlohmann_json)
@@ -56,7 +58,7 @@ add_executable(DungeonsTests
     "tests/time_test.cpp" 
     "tests/uid_test.cpp"
     "tests/test_main.cpp" 
- "tests/result_test.cpp" "tests/style_stack_test.cpp" "tests/char_styling_test.cpp")
+ "tests/result_test.cpp" "tests/style_stack_test.cpp" "tests/char_styling_test.cpp" "tests/raw_char_matrix_test.cpp")
 target_link_libraries(DungeonsTests 
   GTest::gtest_main 
   nlohmann_json::nlohmann_json 

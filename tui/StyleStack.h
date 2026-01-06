@@ -7,7 +7,8 @@
 
 namespace dungeons::tui {
 
-
+	// Не используется в остальном коде. Отмечен как экспериментальный
+#ifdef DNG_EXPERIMENTAL
 	class StyleStack {
 		std::deque<CharStyle> container_;
 
@@ -60,6 +61,6 @@ namespace dungeons::tui {
 			container_.clear();
 		}
 	};
-
+#endif
 
 }

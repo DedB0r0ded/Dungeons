@@ -14,6 +14,8 @@
 namespace dungeons::tui {
 
 
+// Не используется в основном коде. Отмечен экспериментальным.
+#ifdef DNG_EXPERIMENTAL
     enum class StyleOperation : uint16_t {
         NONE = 0,
         SET_FG_COLOR = 1 << 0,
@@ -32,7 +34,7 @@ namespace dungeons::tui {
     constexpr bool has_operation(StyleOperation flags, StyleOperation flag) noexcept {
         return (flags & flag) == flag && flag != StyleOperation::NONE;
     }
-
+#endif
 
     enum class Color {
         BLACK,

@@ -7,10 +7,6 @@
 namespace dungeons::tui {
 
 
-	class CharMatrix {
-		
-	};
-
 	class StyleMatrix {
 
 	};

@@ -5,6 +5,7 @@
 using namespace dungeons;
 using namespace dungeons::tui;
 
+#ifdef DNG_EXPERIMENTAL
 class StyleStackTest : public ::testing::Test {
 protected:
     void SetUp() override {
@@ -620,3 +621,4 @@ TEST_F(StyleStackTest, State_SizeMatchesActualElements) {
 
     EXPECT_EQ(stack.size(), 0);
 }
+#endif
