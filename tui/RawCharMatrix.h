@@ -152,6 +152,8 @@ namespace dungeons::tui {
                 } else {
                     line_idx++;
                     char_idx = 0;
+                    container_[line_idx][char_idx] = ch;
+                    char_idx++;
                 }
             }
         }
