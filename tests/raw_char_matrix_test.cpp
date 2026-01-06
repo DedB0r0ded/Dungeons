@@ -714,5 +714,5 @@ TEST_F(RawCharMatrixTest, EdgeCase_SpecialCharacters) {
     auto row2 = matrix.get_row(2);
     ASSERT_TRUE(row2.is_ok());
     // UTF-8 символы займут больше байт
-    EXPECT_GT(row2.value().size(), 0);
+    EXPECT_GE(row2.value().size(), 3);
 }
