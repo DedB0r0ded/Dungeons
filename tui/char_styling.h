@@ -63,21 +63,8 @@ namespace dungeons::tui {
             return !(*this == other);
         }
 
-        CharStyle& operator=(const CharStyle& other) noexcept {
-            if (*this == other)
-                return *this;
-            bg_color = other.bg_color;
-            fg_color = other.fg_color;
-            bg_ansi = other.bg_ansi;
-            fg_ansi = other.fg_ansi;
-            bg_r = other.bg_r;
-            bg_g = other.bg_g;
-            bg_b = other.bg_b;
-            fg_r = other.fg_r;
-            fg_g = other.fg_g;
-            fg_b = other.fg_b;
-            style = other.style;
-        }
+        CharStyle& operator=(const CharStyle& other) = default;
+        CharStyle& operator=(CharStyle&& other) = default;
 
 
         // Валидация

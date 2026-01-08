@@ -20,98 +20,6 @@ namespace dungeons::tui {
 
 
         // ============================================================================
-        // Вспомогательные методы конвертации UTF-8 <-> UTF-32
-        // ============================================================================
-
-        /**
-         Конвертация UTF-8 строки в UTF-32
-         Каждый UTF-8 символ (1-4 байта) преобразуется в один char32_t
-         */
-        static std::u32string utf8_to_utf32(const std::string& utf8) {
-            std::u32string result;
-            result.reserve(utf8.size()); // Оптимизация: предполагаем ASCII
-            for (size_t i = 0; i < utf8.size(); ) {
-                unsigned char c = static_cast<unsigned char>(utf8[i]);
-                char32_t unicode_char = 0;
-                if ((c & 0x80) == 0) {
-                    // 1-байтовый символ (ASCII): 0xxxxxxx
-                    unicode_char = c;
-                    i += 1;
-                }
-                else if ((c & 0xE0) == 0xC0) {
-                    // 2-байтовый символ: 110xxxxx 10xxxxxx
-                    if (i + 1 >= utf8.size()) break;
-                    unicode_char = ((c & 0x1F) << 6) |
-                        (static_cast<unsigned char>(utf8[i + 1]) & 0x3F);
-                    i += 2;
-                }
-                else if ((c & 0xF0) == 0xE0) {
-                    // 3-байтовый символ: 1110xxxx 10xxxxxx 10xxxxxx
-                    if (i + 2 >= utf8.size()) break;
-                    unicode_char = ((c & 0x0F) << 12) |
-                        ((static_cast<unsigned char>(utf8[i + 1]) & 0x3F) << 6) |
-                        (static_cast<unsigned char>(utf8[i + 2]) & 0x3F);
-                    i += 3;
-                }
-                else if ((c & 0xF8) == 0xF0) {
-                    // 4-байтовый символ: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-                    if (i + 3 >= utf8.size()) break;
-                    unicode_char = ((c & 0x07) << 18) |
-                        ((static_cast<unsigned char>(utf8[i + 1]) & 0x3F) << 12) |
-                        ((static_cast<unsigned char>(utf8[i + 2]) & 0x3F) << 6) |
-                        (static_cast<unsigned char>(utf8[i + 3]) & 0x3F);
-                    i += 4;
-                }
-                else {
-                    // Некорректный UTF-8, пропускаем байт
-                    i++;
-                    continue;
-                }
-                result.push_back(unicode_char);
-            }
-            return result;
-        }
-
-        /**
-         Конвертация UTF-32 строки в UTF-8
-         Каждый char32_t преобразуется в 1-4 байта UTF-8
-         */
-        static std::string utf32_to_utf8(const std::u32string& utf32) {
-            std::string result;
-            result.reserve(utf32.size() * 2); // Оптимизация: предполагаем ~2 байта на символ
-            for (char32_t ch : utf32) {
-                if (ch < 0x80) {
-                    // 1-байтовый символ (ASCII)
-                    result.push_back(static_cast<char>(ch));
-                }
-                else if (ch < 0x800) {
-                    // 2-байтовый символ
-                    result.push_back(static_cast<char>(0xC0 | (ch >> 6)));
-                    result.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
-                }
-                else if (ch < 0x10000) {
-                    // 3-байтовый символ
-                    result.push_back(static_cast<char>(0xE0 | (ch >> 12)));
-                    result.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
-                    result.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
-                }
-                else if (ch < 0x110000) {
-                    // 4-байтовый символ
-                    result.push_back(static_cast<char>(0xF0 | (ch >> 18)));
-                    result.push_back(static_cast<char>(0x80 | ((ch >> 12) & 0x3F)));
-                    result.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
-                    result.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
-                }
-                else {
-                    // Некорректный Unicode код, пропускаем. TODO: новый тип ошибки?
-                    continue;
-                }
-            }
-            return result;
-        }
-
-
-        // ============================================================================
         // Вспомогательные методы валидации (идентичны RawCharMatrix)
         // ============================================================================
 
@@ -220,6 +128,97 @@ namespace dungeons::tui {
 
     public:
         // ============================================================================
+        // Вспомогательные методы конвертации UTF-8 <-> UTF-32
+        // ============================================================================
+
+        /**
+         Конвертация UTF-8 строки в UTF-32
+         Каждый UTF-8 символ (1-4 байта) преобразуется в один char32_t
+         */
+        static std::u32string utf8_to_utf32(const std::string& utf8) {
+            std::u32string result;
+            result.reserve(utf8.size()); // Оптимизация: предполагаем ASCII
+            for (size_t i = 0; i < utf8.size(); ) {
+                unsigned char c = static_cast<unsigned char>(utf8[i]);
+                char32_t unicode_char = 0;
+                if ((c & 0x80) == 0) {
+                    // 1-байтовый символ (ASCII): 0xxxxxxx
+                    unicode_char = c;
+                    i += 1;
+                }
+                else if ((c & 0xE0) == 0xC0) {
+                    // 2-байтовый символ: 110xxxxx 10xxxxxx
+                    if (i + 1 >= utf8.size()) break;
+                    unicode_char = ((c & 0x1F) << 6) |
+                        (static_cast<unsigned char>(utf8[i + 1]) & 0x3F);
+                    i += 2;
+                }
+                else if ((c & 0xF0) == 0xE0) {
+                    // 3-байтовый символ: 1110xxxx 10xxxxxx 10xxxxxx
+                    if (i + 2 >= utf8.size()) break;
+                    unicode_char = ((c & 0x0F) << 12) |
+                        ((static_cast<unsigned char>(utf8[i + 1]) & 0x3F) << 6) |
+                        (static_cast<unsigned char>(utf8[i + 2]) & 0x3F);
+                    i += 3;
+                }
+                else if ((c & 0xF8) == 0xF0) {
+                    // 4-байтовый символ: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                    if (i + 3 >= utf8.size()) break;
+                    unicode_char = ((c & 0x07) << 18) |
+                        ((static_cast<unsigned char>(utf8[i + 1]) & 0x3F) << 12) |
+                        ((static_cast<unsigned char>(utf8[i + 2]) & 0x3F) << 6) |
+                        (static_cast<unsigned char>(utf8[i + 3]) & 0x3F);
+                    i += 4;
+                }
+                else {
+                    // Некорректный UTF-8, пропускаем байт
+                    i++;
+                    continue;
+                }
+                result.push_back(unicode_char);
+            }
+            return result;
+        }
+
+        /**
+         Конвертация UTF-32 строки в UTF-8
+         Каждый char32_t преобразуется в 1-4 байта UTF-8
+         */
+        static std::string utf32_to_utf8(const std::u32string& utf32) {
+            std::string result;
+            result.reserve(utf32.size() * 2); // Оптимизация: предполагаем ~2 байта на символ
+            for (char32_t ch : utf32) {
+                if (ch < 0x80) {
+                    // 1-байтовый символ (ASCII)
+                    result.push_back(static_cast<char>(ch));
+                }
+                else if (ch < 0x800) {
+                    // 2-байтовый символ
+                    result.push_back(static_cast<char>(0xC0 | (ch >> 6)));
+                    result.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+                }
+                else if (ch < 0x10000) {
+                    // 3-байтовый символ
+                    result.push_back(static_cast<char>(0xE0 | (ch >> 12)));
+                    result.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
+                    result.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+                }
+                else if (ch < 0x110000) {
+                    // 4-байтовый символ
+                    result.push_back(static_cast<char>(0xF0 | (ch >> 18)));
+                    result.push_back(static_cast<char>(0x80 | ((ch >> 12) & 0x3F)));
+                    result.push_back(static_cast<char>(0x80 | ((ch >> 6) & 0x3F)));
+                    result.push_back(static_cast<char>(0x80 | (ch & 0x3F)));
+                }
+                else {
+                    // Некорректный Unicode код, пропускаем. TODO: новый тип ошибки?
+                    continue;
+                }
+            }
+            return result;
+        }
+
+        // ============================================================================
         // Конструкторы
         // ============================================================================
 
@@ -267,7 +266,7 @@ namespace dungeons::tui {
 
         /**
          Конструктор из UTF-8 строки с автоопределением размеров по \n
-         Корректно работает с кириллицей.
+         Корректно работает с Non-ASCII символами
          */
         UnicodeCharMatrix(const std::string& utf8_lines) {
             if (utf8_lines.empty()) {
@@ -298,7 +297,7 @@ namespace dungeons::tui {
 
         /**
          Конструктор из списка UTF-8 строк
-         Корректно работает с кириллицей
+         Корректно работает с Non-ASCII символами
          */
         UnicodeCharMatrix(const std::initializer_list<std::string_view>& utf8_lines) {
             if (utf8_lines.size() == 0) {
@@ -411,7 +410,7 @@ namespace dungeons::tui {
 
         /**
          Установить строку из UTF-8 строки
-         Корректно работает с кириллицей
+         Корректно работает с Non-ASCII символами
          */
         Result<void> set_row(size_t row, const std::string& utf8_str) {
             auto row_check = validate_row(row);
@@ -441,7 +440,7 @@ namespace dungeons::tui {
 
         /**
          Получить строку как UTF-8 строку
-         Возвращает правильную кириллицу!
+         Возвращает правильные Non-ASCII символы
          */
         Result<std::string> get_row(size_t row) const {
             auto validation = validate_row(row);
@@ -523,7 +522,7 @@ namespace dungeons::tui {
 
         /**
          Преобразовать в UTF-8 строку для вывода
-         Корректная кириллица в выводе!
+         Корректно работает с Non-ASCII символами
          */
         std::string to_string() const {
             std::string result;

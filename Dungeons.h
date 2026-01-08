@@ -15,4 +15,6 @@
 #include "./time.h"
 #include "./Random.h"
 #include "./tui/Terminal.h"
+#include "./tui/UnicodeCharMatrix.h"
+#include "./tui/StyleMatrix.h"
 #include "./tui/frame_building.h"
