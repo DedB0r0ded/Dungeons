@@ -90,19 +90,17 @@ namespace dungeons {
         }
 
         Result<void> set_month(uint8_t value) noexcept {
-            if (value < 1 || value > 12) {
+            if (value < 1 || value > 12)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Month must be in range [1, 12]");
-            }
             month_ = value;
             return Ok();
         }
 
         Result<void> set_day(uint8_t value) noexcept {
-            if (value < 1 || value > 31) {
+            if (value < 1 || value > 31)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Day must be in range [1, 31]");
-            }
             day_ = value;
             return Ok();
         }
@@ -169,19 +167,17 @@ namespace dungeons {
 
         Result<void> set_milliseconds_from_midnight(uint32_t value) noexcept {
             uint32_t max_millis = 86400000 + (leap_second_ ? 1000 : 0);
-            if (value >= max_millis) {
+            if (value >= max_millis)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Milliseconds from midnight exceeds maximum for the day");
-            }
             milliseconds_from_midnight_ = value;
             return Ok();
         }
 
         Result<void> set_timezone_offset_minutes(int16_t value) noexcept {
-            if (!valid_timezone_offset(value)) {
+            if (!valid_timezone_offset(value))
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Timezone offset must be in range [-720, 840] minutes");
-            }
             timezone_offset_minutes_ = value;
             return Ok();
         }
@@ -195,10 +191,9 @@ namespace dungeons {
         }
 
         Result<void> set_microseconds(uint16_t value) noexcept {
-            if (value >= 1000) {
+            if (value >= 1000)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Microseconds must be in range [0, 999]");
-            }
             microseconds_ = value;
             return Ok();
         }
@@ -214,27 +209,22 @@ namespace dungeons {
         }
 
         Result<void> validate() const noexcept {
-            if (month_ < 1 || month_ > 12) {
+            if (month_ < 1 || month_ > 12)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Invalid month: must be 1-12");
-            }
-            if (day_ < 1 || day_ > 31) {
+            if (day_ < 1 || day_ > 31)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Invalid day: must be 1-31");
-            }
             uint32_t max_millis = 86400000 + (leap_second_ ? 1000 : 0);
-            if (milliseconds_from_midnight_ >= max_millis) {
+            if (milliseconds_from_midnight_ >= max_millis)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Invalid milliseconds");
-            }
-            if (!has_valid_timezone_offset()) {
+            if (!has_valid_timezone_offset())
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Invalid timezone offset");
-            }
-            if (microseconds_ >= 1000) {
+            if (microseconds_ >= 1000)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Invalid microseconds: must be 0-999");
-            }
             return Ok();
         }
 
@@ -251,14 +241,12 @@ namespace dungeons {
 
         // Перемещение в другой часовой пояс
         Result<void> move_to_timezone(int16_t target_timezone_offset_minutes) noexcept {
-            if (!valid_timezone_offset(target_timezone_offset_minutes)) {
+            if (!valid_timezone_offset(target_timezone_offset_minutes))
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Target timezone offset is invalid");
-            }
             int32_t diff = target_timezone_offset_minutes - timezone_offset_minutes_;
             timezone_offset_minutes_ = target_timezone_offset_minutes;
-            int64_t new_millis = static_cast<int64_t>(milliseconds_from_midnight_) +
-                (diff * 60000);
+            int64_t new_millis = static_cast<int64_t>(milliseconds_from_midnight_) + (diff * 60000);
             // Обработка перехода через границу суток
             if (new_millis < 0) {
                 // TODO: уменьшить день
@@ -288,20 +276,16 @@ namespace dungeons {
             result.is_dst_ = tm_info.tm_isdst > 0 ? 1 : 0;
             result.microseconds_ = 0;
             result.reserved_ = 0;
-
             auto validation = result.validate();
-            if (!validation) {
+            if (!validation)
                 return Err<Time>(validation.error().code(), validation.error().message());
-            }
-
             return Ok(result);
         }
 
         static Result<Time> from_time_t(std::time_t t, int16_t tz_offset = 0) {
             std::tm* tm_info = std::gmtime(&t);
-            if (!tm_info) {
+            if (!tm_info)
                 return Err<Time>(ErrorCode::INVALID_ARGUMENT, "Invalid time_t value");
-            }
             return from_tm(*tm_info, tz_offset);
         }
 
@@ -378,8 +362,7 @@ namespace dungeons {
         }
 
         // Конструктор из system_clock::time_point (для обратной совместимости)
-        explicit Time(const std::chrono::system_clock::time_point& tp,
-            int16_t tz_offset = 0) {
+        explicit Time(const std::chrono::system_clock::time_point& tp, int16_t tz_offset = 0) {
             auto result = from_system_clock(tp, tz_offset);
             if (result) {
                 *this = result.value();
@@ -411,6 +394,8 @@ namespace dungeons {
 
         // Операторы сравнения
         bool operator==(const Time& other) const noexcept {
+            if (this == &other)
+                return true;
             return std::memcmp(this, &other, sizeof(Time)) == 0;
         }
 

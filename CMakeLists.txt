@@ -12,6 +12,11 @@ add_definitions(-DNOMINMAX)
 
 project ("Dungeons")
 
+# ЁБАНЫЙ МАЙКРОСОФТ
+if(WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\"")
+endif()
+
 # --- Добавляем nlohmann json - работа с JSON-форматом ---
 set(NLOHMANN_JSON_VERSION "v3.12.0")
 include(FetchContent)
@@ -24,13 +29,31 @@ FetchContent_MakeAvailable(json)
 
 # --- Основной исполняемый файл ---
 add_executable(Dungeons
-    "uid.h" "time.h" "Random.h" 
-    "tui/Terminal.h" "tui/frame_building.h" 
-    "EventLoop.h"
+    "time.h"
+    "Random.h" 
+    "result.h"
+    
+    "backend/uid.h" 
+    "backend/EventLoop.h"
+    "backend/Entity.h" 
+    "backend/Armor.h" 
+    "backend/Weapon.h" 
+    "backend/Enemy.h"
+    "backend/Location.h"  
+    
+    "tui/tui_base.h" 
+    "tui/char_styling.h" 
+    "tui/StyleMatrix.h" 
+    "tui/StyleStack.h" # Depricated
+    "tui/StylePicker.h" # Depricated
+    "tui/RawCharMatrix.h" 
+    "tui/UnicodeCharMatrix.h" 
+    "tui/frame_building.h" 
+    "tui/Terminal.h" 
+    
     "Dungeons.h"
     "Dungeons.cpp"
- "result.h"
- "tui/tui_base.h" "tui/char_styling.h" "tui/StyleMatrix.h" "tui/StyleStack.h" "tui/RawCharMatrix.h" "tui/StylePicker.h" "tui/UnicodeCharMatrix.h" "backend/Entity.h" "backend/Location.h" )
+ "backend/backend_base.h" "backend/Inventory.h" "backend/Money.h")
 
 set_target_properties(Dungeons PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(Dungeons PRIVATE nlohmann_json::nlohmann_json)
@@ -56,11 +79,20 @@ enable_testing()  # Включаем CTest
 
 # --- Добавляем тесты ---
 add_executable(DungeonsTests
+    "tests/result_test.cpp" 
+    "tests/test_random.cpp"
     "tests/time_test.cpp" 
+
     "tests/uid_test.cpp"
-    "tests/test_main.cpp" 
-    "tests/result_test.cpp" "tests/style_stack_test.cpp" "tests/char_styling_test.cpp" "tests/raw_char_matrix_test.cpp" "tests/unicode_char_matrix_test.cpp" "tests/style_matrix_test.cpp"
+    
+    "tests/style_stack_test.cpp" 
+    "tests/char_styling_test.cpp" 
+    "tests/raw_char_matrix_test.cpp" 
+    "tests/unicode_char_matrix_test.cpp" 
+    "tests/style_matrix_test.cpp"
     "tests/frame_snapshot_test.cpp"
+
+    "tests/test_main.cpp" 
 )
 target_link_libraries(DungeonsTests 
   GTest::gtest_main 

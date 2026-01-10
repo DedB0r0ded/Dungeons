@@ -1,0 +1,16 @@
+#pragma once
+
+
+#include "./backend_base.h"
+#include "./Entity.h"
+
+
+namespace dungeons::backend {
+
+
+	class Armor : public Entity {
+
+	};
+
+
+}

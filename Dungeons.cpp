@@ -6,24 +6,19 @@
 //  V
 //"Привет! Hello! 你好！
 
-void initLocale() {
-	const char* locale_result = setlocale(LC_ALL, "");
-#ifdef _WIN32
-	locale_result = setlocale(LC_ALL, ".UTF-8");
-	SetConsoleOutputCP(CP_UTF8);
-#endif
-}
 
 using dungeons::tui::UnicodeCharMatrix;
 using dungeons::tui::FrameSnapshot;
 using dungeons::tui::CharStyle;
 using dungeons::tui::Color;
 
+using dungeons::tui::Terminal;
+
 int main()
 {
-	initLocale();
-	dungeons::Random::init();
-	auto t = dungeons::tui::BaseTerminal(std::cout);
+	Terminal::init_locale();
+	Terminal::set_size(80, 30);
+	auto t = Terminal(std::cout);
 
 	UnicodeCharMatrix chars({ "АБ你", "ГДЕ", "ЁЖЗ" });
 	FrameSnapshot frame(chars, CharStyle(Color::BRIGHT_WHITE, Color::BLACK));
@@ -33,7 +28,7 @@ int main()
 	t.put("\033[0m");
 	t.print();
 	a.move_to_timezone(480);
-	t.putln(std::to_string(dungeons::Random::randDouble()));
+	t.putln(std::to_string(dungeons::Random::next_double()));
 	t.putln(a.to_string());
 	t.print();
 	return 0;
