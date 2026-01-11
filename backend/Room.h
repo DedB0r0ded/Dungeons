@@ -8,9 +8,7 @@
 namespace dungeons::backend {
 
 
-	class Enemy : public Entity {
-		
-	};
+
 
 
 }

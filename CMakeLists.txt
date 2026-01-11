@@ -27,6 +27,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
+
 # --- Основной исполняемый файл ---
 add_executable(Dungeons
     "time.h"
@@ -53,10 +54,29 @@ add_executable(Dungeons
     
     "Dungeons.h"
     "Dungeons.cpp"
- "backend/backend_base.h" "backend/Inventory.h" "backend/Money.h")
+ "backend/backend_base.h" "backend/Inventory.h" "backend/Money.h" "backend/Room.h" "backend/EnemyFabric.h")
 
 set_target_properties(Dungeons PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(Dungeons PRIVATE nlohmann_json::nlohmann_json)
+
+
+add_library(sqlite3 STATIC
+    external/sqlite/sqlite3.c
+)
+
+target_include_directories(sqlite3
+    PUBLIC
+        external/sqlite
+)
+
+target_compile_definitions(sqlite3
+    PUBLIC
+        SQLITE_THREADSAFE=1
+        SQLITE_ENABLE_FTS5
+        SQLITE_ENABLE_JSON1
+)
+
+
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Dungeons PROPERTY CXX_STANDARD 20)
