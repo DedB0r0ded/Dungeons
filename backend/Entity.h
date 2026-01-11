@@ -1,8 +1,10 @@
 // Entity.h
 #pragma once
 
+
 #include "./uid.h"
 #include "../result.h"
+
 
 namespace dungeons::backend {
 

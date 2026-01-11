@@ -9,7 +9,7 @@
 #include "../time.h"
 #include "../result.h"
 
-namespace dungeons::backend {
+namespace dungeons {
 
 
     class Logger {
@@ -27,11 +27,13 @@ namespace dungeons::backend {
         Logger& operator=(Logger&&) = delete;
         ~Logger() = default;
 
+
         // Singleton
         static Logger& instance() {
             static Logger logger;
             return logger;
         }
+
 
         // Логирование сообщения
         void log(const std::string& message) {
@@ -48,6 +50,7 @@ namespace dungeons::backend {
                 << "[Thread:" << thread_id_stream.str() << "] "
                 << message << "\n";
         }
+
 
         // Логирование с уровнем
         void log(const std::string& level, const std::string& message) {
@@ -66,11 +69,13 @@ namespace dungeons::backend {
                 << message << "\n";
         }
 
+
         // Получение всего лога
         std::string get_log() const {
             std::lock_guard<std::mutex> lock(mutex_);
             return buffer_.str();
         }
+
 
         // Очистка лога
         void clear() {
