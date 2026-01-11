@@ -54,7 +54,7 @@ add_executable(Dungeons
     
     "Dungeons.h"
     "Dungeons.cpp"
- "backend/backend_base.h" "backend/Inventory.h" "backend/Money.h" "backend/Room.h" "backend/EnemyFabric.h" "backend/Attributes.h" "backend/ItemMeta.h" "backend/Item.h" "backend/Alive.h" "backend/Player.h" "backend/Battle.h" "backend/factories.h")
+ "backend/backend_base.h" "backend/Inventory.h" "backend/Money.h" "backend/Room.h" "backend/EnemyFabric.h" "backend/Attributes.h" "backend/ItemMeta.h" "backend/Item.h" "backend/Alive.h" "backend/Player.h" "backend/Battle.h" "backend/factories.h" "backend/repositories.h")
 
 set_target_properties(Dungeons PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(Dungeons PRIVATE nlohmann_json::nlohmann_json)

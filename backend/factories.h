@@ -1,6 +1,6 @@
 // Factories.h
 // TODO: fix newlines
-// TODO: translate to russian
+// TODO: translate to russian (comments and error messages)
 // TODO: remove redundant private modifiers
 #pragma once
 
