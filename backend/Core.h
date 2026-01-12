@@ -1,26 +1,22 @@
-// GameBackend.h
-// TODO: fix newlines
-// TODO: translate to russian (comments and error messages)
-// TODO: remove redundant private modifiers
-// TODO: rename GameBackend to Core
+// Core.h
 #pragma once
 
-#include "./Repository.h"
-#include "./Index.h"
+
+#include "./repositories.h"
+#include "./indexes.h"
 #include "./Player.h"
-#include "./Factories.h"
-#include "../result.h"
-#include <memory>
+#include "./factories.h"
+#include "./backend_base.h"
+#include "../Logger.h"
+
 #include <string>
+
 
 namespace dungeons::backend {
 
-    class GameBackend {
-    private:
-        // SQLite connection would go here
-        // sqlite3* db_;
 
-        // Repositories
+    class Core {
+        // Репозитории
         std::unique_ptr<ArmorMetaRepository> armor_meta_repo_;
         std::unique_ptr<WeaponMetaRepository> weapon_meta_repo_;
         std::unique_ptr<InventoryRepository> inventory_repo_;
@@ -29,7 +25,7 @@ namespace dungeons::backend {
         std::unique_ptr<LocationRepository> location_repo_;
         std::unique_ptr<RoomRepository> room_repo_;
 
-        // Indexes
+        // Индексы
         std::unique_ptr<ArmorMetaIndex> armor_meta_index_;
         std::unique_ptr<WeaponMetaIndex> weapon_meta_index_;
         std::unique_ptr<EnemyMetaIndex> enemy_meta_index_;
@@ -38,21 +34,22 @@ namespace dungeons::backend {
         std::unique_ptr<RoomIndex> room_index_;
         std::unique_ptr<PlayerIndex> player_index_;
 
-        // Factories
+        // Фабрики
         std::shared_ptr<WeaponFactory> weapon_factory_;
         std::shared_ptr<ArmorFactory> armor_factory_;
         std::shared_ptr<InventoryFactory> inventory_factory_;
         std::shared_ptr<EnemyFactory> enemy_factory_;
 
-        // Current player
+        // Текущий игрок
         std::shared_ptr<Player> current_player_;
 
-        // Data directory
+        // Директория данных
         std::string data_directory_;
 
+
     public:
-        // Constructor
-        GameBackend() noexcept
+        // Конструктор
+        Core() noexcept
             : armor_meta_repo_(nullptr),
             weapon_meta_repo_(nullptr),
             inventory_repo_(nullptr),
@@ -73,11 +70,10 @@ namespace dungeons::backend {
             enemy_factory_(nullptr),
             current_player_(nullptr),
             data_directory_("./data") {
-
             initialize();
         }
 
-        explicit GameBackend(const std::string& data_directory) noexcept
+        explicit Core(const std::string& data_directory) noexcept
             : armor_meta_repo_(nullptr),
             weapon_meta_repo_(nullptr),
             inventory_repo_(nullptr),
@@ -98,24 +94,27 @@ namespace dungeons::backend {
             enemy_factory_(nullptr),
             current_player_(nullptr),
             data_directory_(data_directory) {
-
             initialize();
         }
 
-        // Delete copy/move
-        GameBackend(const GameBackend&) = delete;
-        GameBackend(GameBackend&&) = delete;
-        GameBackend& operator=(const GameBackend&) = delete;
-        GameBackend& operator=(GameBackend&&) = delete;
 
-        // Destructor - saves all data
-        ~GameBackend() {
+        // Удалить копирование/перемещение
+        Core(const Core&) = delete;
+        Core(Core&&) = delete;
+        Core& operator=(const Core&) = delete;
+        Core& operator=(Core&&) = delete;
+
+        // Деструктор - сохраняет все данные
+        ~Core() {
+            ::dungeons::Logger::instance().info("Core: сохранение всех данных перед выходом");
             save_all();
         }
 
-        // Initialize repositories and indexes
+        
+        // Инициализация репозиториев и индексов
         void initialize() noexcept {
-            // Create repositories
+            ::dungeons::Logger::instance().info("Core: инициализация репозиториев и индексов");
+            // Создать репозитории
             armor_meta_repo_ = std::make_unique<ArmorMetaRepository>();
             weapon_meta_repo_ = std::make_unique<WeaponMetaRepository>();
             inventory_repo_ = std::make_unique<InventoryRepository>();
@@ -123,8 +122,7 @@ namespace dungeons::backend {
             enemy_meta_repo_ = std::make_unique<EnemyMetaRepository>();
             location_repo_ = std::make_unique<LocationRepository>();
             room_repo_ = std::make_unique<RoomRepository>();
-
-            // Create indexes
+            // Создать индексы
             armor_meta_index_ = std::make_unique<ArmorMetaIndex>();
             weapon_meta_index_ = std::make_unique<WeaponMetaIndex>();
             enemy_meta_index_ = std::make_unique<EnemyMetaIndex>();
@@ -132,59 +130,54 @@ namespace dungeons::backend {
             location_index_ = std::make_unique<LocationIndex>();
             room_index_ = std::make_unique<RoomIndex>();
             player_index_ = std::make_unique<PlayerIndex>();
-
-            // Load all data from repositories into indexes
+            // Загрузить все данные из репозиториев в индексы
             load_all();
-
-            // Create factories
+            // Создать фабрики
             create_factories();
+            ::dungeons::Logger::instance().info("Core: инициализация завершена");
         }
 
-        // Load all data from repositories
+        
+        // Загрузить все данные из репозиториев
         void load_all() noexcept {
-            // This would load data from SQLite repositories into indexes
-            // For now, this is a placeholder
+            ::dungeons::Logger::instance().info("Core: загрузка данных из репозиториев");
+            // Здесь будет загрузка данных из SQLite репозиториев в индексы
+            // Пока это заглушка
         }
 
-        // Save all data to repositories
+        // Сохранить все данные в репозитории
         void save_all() noexcept {
-            // Save all indexes to repositories
-            // This would iterate through indexes and save to SQLite
-            // For now, this is a placeholder
+            ::dungeons::Logger::instance().info("Core: сохранение данных в репозитории");
+            // Сохранить все индексы в репозитории
+            // Здесь будет итерация по индексам и сохранение в SQLite
+            // Пока это заглушка
         }
 
-        // Create factories with meta pools from indexes
+        // Создать фабрики с пулами метаданных из индексов
         void create_factories() noexcept {
-            // Get meta pools from indexes
+            ::dungeons::Logger::instance().info("Core: создание фабрик");
+            // Получить пулы метаданных из индексов
             auto weapon_meta_vector = weapon_meta_index_->as_vector();
             auto armor_meta_vector = armor_meta_index_->as_vector();
             auto enemy_meta_vector = enemy_meta_index_->as_vector();
-
-            // Create factories
+            // Создать фабрики
             weapon_factory_ = std::make_shared<WeaponFactory>(weapon_meta_vector);
             armor_factory_ = std::make_shared<ArmorFactory>(armor_meta_vector);
-            inventory_factory_ = std::make_shared<InventoryFactory>(
-                weapon_factory_, armor_factory_);
+            inventory_factory_ = std::make_shared<InventoryFactory>(weapon_factory_, armor_factory_);
             enemy_factory_ = std::make_shared<EnemyFactory>(
                 enemy_meta_vector, weapon_factory_, armor_factory_, inventory_factory_);
+            ::dungeons::Logger::instance().info("Core: фабрики созданы успешно");
         }
 
-        // Current player management
+        // Управление текущим игроком
         ::dungeons::Result<void> set_current_player(const uid_t& uid) noexcept {
-            if (!player_index_) {
-                return ::dungeons::Err(
-                    ::dungeons::ErrorCode::INVALID_ARGUMENT,
-                    "Player index not initialized");
-            }
-
+            if (!player_index_)
+                return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT, "Индекс игроков не инициализирован");
             auto player_result = player_index_->get(uid);
-            if (!player_result) {
-                return ::dungeons::Err(
-                    player_result.error().code(),
-                    player_result.error().message());
-            }
-
+            if (!player_result)
+                return ::dungeons::Err(player_result.error().code(), player_result.error().message());
             current_player_ = player_result.value();
+            ::dungeons::Logger::instance().info("Core: установлен текущий игрок '" + current_player_->name() + "'");
             return ::dungeons::Ok();
         }
 
@@ -192,7 +185,8 @@ namespace dungeons::backend {
             return current_player_;
         }
 
-        // Index getters
+
+        // Геттеры индексов
         ArmorMetaIndex& armor_meta_index() noexcept { return *armor_meta_index_; }
         const ArmorMetaIndex& armor_meta_index() const noexcept { return *armor_meta_index_; }
 
@@ -214,13 +208,13 @@ namespace dungeons::backend {
         PlayerIndex& player_index() noexcept { return *player_index_; }
         const PlayerIndex& player_index() const noexcept { return *player_index_; }
 
-        // Factory getters
+        // Геттеры фабрик
         std::shared_ptr<WeaponFactory> weapon_factory() const noexcept { return weapon_factory_; }
         std::shared_ptr<ArmorFactory> armor_factory() const noexcept { return armor_factory_; }
         std::shared_ptr<InventoryFactory> inventory_factory() const noexcept { return inventory_factory_; }
         std::shared_ptr<EnemyFactory> enemy_factory() const noexcept { return enemy_factory_; }
 
-        // Repository getters (for direct access if needed)
+        // Геттеры репозиториев (для прямого доступа если нужно)
         ArmorMetaRepository& armor_meta_repository() noexcept { return *armor_meta_repo_; }
         WeaponMetaRepository& weapon_meta_repository() noexcept { return *weapon_meta_repo_; }
         InventoryRepository& inventory_repository() noexcept { return *inventory_repo_; }
@@ -229,24 +223,18 @@ namespace dungeons::backend {
         LocationRepository& location_repository() noexcept { return *location_repo_; }
         RoomRepository& room_repository() noexcept { return *room_repo_; }
 
-        // Validation
+
+        // Валидация
         ::dungeons::Result<void> validate() const noexcept {
             if (!armor_meta_index_ || !weapon_meta_index_ || !enemy_meta_index_ ||
-                !inventory_index_ || !location_index_ || !room_index_ || !player_index_) {
-                return ::dungeons::Err(
-                    ::dungeons::ErrorCode::VALIDATION_FAILED,
-                    "One or more indexes not initialized");
-            }
-
+                !inventory_index_ || !location_index_ || !room_index_ || !player_index_)
+                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Один или более индексов не инициализированы");
             if (!armor_meta_repo_ || !weapon_meta_repo_ || !inventory_repo_ ||
-                !player_repo_ || !enemy_meta_repo_ || !location_repo_ || !room_repo_) {
-                return ::dungeons::Err(
-                    ::dungeons::ErrorCode::VALIDATION_FAILED,
-                    "One or more repositories not initialized");
-            }
-
+                !player_repo_ || !enemy_meta_repo_ || !location_repo_ || !room_repo_)
+                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Один или более репозиториев не инициализированы");
             return ::dungeons::Ok();
         }
     };
+
 
 } // namespace dungeons::backend
