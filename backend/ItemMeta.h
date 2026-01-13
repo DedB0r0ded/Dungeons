@@ -21,10 +21,7 @@ namespace dungeons::backend {
         ItemMeta(const std::string& name, const std::string& description,
             const Attributes& basis, uint32_t seed_id)
             : Entity(seed_id, UidFlags::IS_ITEM),
-            name_(name),
-            description_(description),
-            generation_basis_(basis) {
-        }
+            name_(name), description_(description), generation_basis_(basis) { }
 
 
     public:
