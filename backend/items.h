@@ -1,4 +1,4 @@
-// Item.h
+// items.h
 #pragma once
 
 
@@ -18,7 +18,8 @@ namespace dungeons::backend {
     class IItem {
     public:
         virtual std::weak_ptr<ItemMeta> meta() const noexcept = 0;
-        // Add this pure virtual method to provide access to uid
+
+        //Доступ к uid напрямую
         virtual const Result<uid_t> uid() const noexcept {
             auto mt = meta().lock();
             if (!mt)
@@ -154,7 +155,7 @@ namespace dungeons::backend {
         }
 
 
-        // Rule of five
+        // Правило пяти
         Armor(const Armor&) = default;
         Armor(Armor&&) noexcept = default;
         Armor& operator=(const Armor&) = default;
@@ -162,7 +163,7 @@ namespace dungeons::backend {
         ~Armor() = default;
 
 
-        // Getter/Setter
+        // Геттеры/сеттеры
         int32_t defense() const noexcept { return defense_; }
 
         ::dungeons::Result<void> defense(int32_t value) noexcept {
@@ -173,7 +174,7 @@ namespace dungeons::backend {
         }
 
 
-        // Validation
+        // Валидация
         ::dungeons::Result<void> validate() const noexcept {
             auto base_validation = Item::validate();
             if (!base_validation)
