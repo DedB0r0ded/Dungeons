@@ -127,7 +127,7 @@ add_executable(DungeonsTests
     "tests/frame_snapshot_test.cpp"
 
     "tests/test_main.cpp" 
-)
+ "tests/money_test.cpp")
 target_link_libraries(DungeonsTests 
   GTest::gtest_main 
   nlohmann_json::nlohmann_json 
