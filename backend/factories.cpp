@@ -71,4 +71,83 @@ namespace dungeons::backend {
     return ::dungeons::Ok(enemy);
 }
 
+::dungeons::Result<std::shared_ptr<Weapon>> WeaponFactory::create_random() noexcept {
+    if (meta_pool_.empty())
+        return ::dungeons::Err<std::shared_ptr<Weapon>>(
+            ::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных оружия пуст");
+    auto meta_weak = ::dungeons::Random::choice(meta_pool_);
+    auto meta = meta_weak.lock();
+    if (!meta)
+        return ::dungeons::Err<std::shared_ptr<Weapon>>(
+            ::dungeons::ErrorCode::INVALID_ARGUMENT, "Метаданные оружия более не валидны");
+    float multiplier = ::dungeons::Random::next_float(LOWER_MULTIPLIER, UPPER_MULTIPLIER);
+    int32_t attack = static_cast<int32_t>(meta->attack_basis() * multiplier);
+    Attributes attrs = meta->generation_basis() * multiplier;
+    int32_t durability = ::dungeons::Random::next_int<int32_t>(50, 150);
+    Money value(::dungeons::Random::next_long_long(100, 1000));
+    auto weapon = std::make_shared<Weapon>(value, attrs, durability, true, meta_weak, attack);
+    return ::dungeons::Ok(weapon);
+}
+
+
+::dungeons::Result<std::shared_ptr<Armor>> ArmorFactory::create_random() noexcept {
+    if (meta_pool_.empty())
+        return ::dungeons::Err<std::shared_ptr<Armor>>(
+            ::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных брони пуст");
+    auto meta_weak = ::dungeons::Random::choice(meta_pool_);
+    auto meta = meta_weak.lock();
+    if (!meta)
+        return ::dungeons::Err<std::shared_ptr<Armor>>(
+            ::dungeons::ErrorCode::INVALID_ARGUMENT, "Метаданные брони более не валидны");
+    float multiplier = ::dungeons::Random::next_float(LOWER_MULTIPLIER, UPPER_MULTIPLIER);
+    int32_t defense = static_cast<int32_t>(meta->defense_basis() * multiplier);
+    Attributes attrs = meta->generation_basis() * multiplier;
+    int32_t durability = ::dungeons::Random::next_int<int32_t>(50, 150);
+    Money value(::dungeons::Random::next_long_long(100, 1000));
+    auto armor = std::make_shared<Armor>(value, attrs, durability, true, meta_weak, defense);
+    return ::dungeons::Ok(armor);
+}
+
+
+::dungeons::backend::Inventory InventoryFactory::create_treasure(size_t room_id) noexcept {
+    int32_t item_count = ::dungeons::Random::next_int<int32_t>(TREASURE_MIN_ITEMS, TREASURE_MAX_ITEMS);
+    int64_t money_amount = TREASURE_MONEY_BASIS * static_cast<int64_t>(room_id);
+    Money money(money_amount);
+    Inventory inventory(20, money);
+    // Добавить случайные предметы
+    for (int32_t i = 0; i < item_count; ++i) {
+        bool is_weapon = ::dungeons::Random::next_bool(0.5);
+        if (is_weapon && weapon_factory_) {
+            auto weapon_result = weapon_factory_->create_random();
+            if (weapon_result)
+                inventory.add_item(weapon_result.value());
+        }
+        else if (!is_weapon && armor_factory_) {
+            auto armor_result = armor_factory_->create_random();
+            if (armor_result)
+                inventory.add_item(armor_result.value());
+        }
+    }
+    return inventory;
+}
+
+::dungeons::backend::Inventory InventoryFactory::create_enemy_loot(size_t room_id) noexcept {
+    int64_t money_amount = ENEMY_MONEY_BASIS * static_cast<int64_t>(room_id);
+    Money money(money_amount);
+    Inventory inventory(10, money);
+    // Добавить один случайный предмет
+    bool is_weapon = ::dungeons::Random::next_bool(0.5);
+    if (is_weapon && weapon_factory_) {
+        auto weapon_result = weapon_factory_->create_random();
+        if (weapon_result)
+            inventory.add_item(weapon_result.value());
+    }
+    else if (!is_weapon && armor_factory_) {
+        auto armor_result = armor_factory_->create_random();
+        if (armor_result)
+            inventory.add_item(armor_result.value());
+    }
+    return inventory;
+}
+
 } // namespace dungeons::backend
