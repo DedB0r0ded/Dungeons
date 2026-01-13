@@ -30,7 +30,7 @@ namespace dungeons::backend {
         // Геттер/сеттер
         int64_t amount() const noexcept { return amount_; }
 
-        ::dungeons::Result<void> amount(int64_t value) noexcept {
+        ::dungeons::Result<void> amount(const int64_t value) noexcept {
             if (value < 0) {
                 return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT,
                     "Money amount cannot be negative");
@@ -42,25 +42,21 @@ namespace dungeons::backend {
 
         // Валидация
         ::dungeons::Result<void> validate() const noexcept {
-            if (amount_ < 0) {
-                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED,
-                    "Money amount is negative");
-            }
+            if (amount_ < 0)
+                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Money amount is negative");
             return ::dungeons::Ok();
         }
 
 
         // Операции с деньгами
-        ::dungeons::Result<void> add(int64_t value) noexcept {
-            if (value < 0) {
-                return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT,
-                    "Cannot add negative amount");
-            }
+        ::dungeons::Result<void> add(const int64_t value) noexcept {
+            if (value < 0)
+                return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT, "Cannot add negative amount");
             amount_ += value;
             return ::dungeons::Ok();
         }
 
-        ::dungeons::Result<void> subtract(int64_t value) noexcept {
+        ::dungeons::Result<void> subtract(const int64_t value) noexcept {
             if (value < 0)
                 return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT, "Cannot subtract negative amount");
             if (amount_ < value)
@@ -69,12 +65,18 @@ namespace dungeons::backend {
             return ::dungeons::Ok();
         }
 
-        ::dungeons::Result<void> add(const Money& other) noexcept {
-            return add(other.amount_);
+        ::dungeons::Result<Money> add(const Money& other) noexcept {
+            auto res = add(other.amount_);
+            if (!res)
+                return Result<Money>(res.error());
+            return Result<Money>(*this);
         }
 
-        ::dungeons::Result<void> subtract(const Money& other) noexcept {
-            return subtract(other.amount_);
+        ::dungeons::Result<Money> subtract(const Money& other) noexcept {
+            auto res = subtract(other.amount_);
+            if (!res)
+                return Result<Money>(res.error());
+            return Result<Money>(*this);
         }
 
 
@@ -106,20 +108,26 @@ namespace dungeons::backend {
 
         // Арифметические операторы
         Money operator+(const Money& other) const noexcept {
-            return Money(amount_ + other.amount_);
+            auto res = Money(*this).add(other);
+            if (!res)
+                return Money(*this);
+            return res.value();
         }
 
         Money operator-(const Money& other) const noexcept {
-            return Money(amount_ - other.amount_);
+            auto res = Money(*this).subtract(other);
+            if (!res)
+                return Money(*this);
+            return res.value();
         }
 
         Money& operator+=(const Money& other) noexcept {
-            amount_ += other.amount_;
+            add(other);
             return *this;
         }
 
         Money& operator-=(const Money& other) noexcept {
-            amount_ -= other.amount_;
+            subtract(other);
             return *this;
         }
     };
