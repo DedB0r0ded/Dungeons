@@ -51,7 +51,7 @@ add_executable(Dungeons
     "backend/uid.h" 
     "backend/EventLoop.h"
     "backend/Entity.h" 
-    "backend/Weapon.h" 
+     
     "backend/Enemy.h"
     "backend/Location.h"  
     
