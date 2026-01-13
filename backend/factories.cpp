@@ -7,11 +7,11 @@ namespace dungeons::backend {
 
 ::dungeons::Result<std::shared_ptr<Weapon>> WeaponFactory::create_for_player(const Player& player) noexcept {
     if (meta_pool_.empty())
-        return ::dungeons::Err<std::shared_ptr<Weapon>>(::dungeons::ErrorCode::VALIDATION_FAILED, "???? ?????????? ?????? ????");
+        return ::dungeons::Err<std::shared_ptr<Weapon>>(::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных оружия пуст");
     auto meta_weak = ::dungeons::Random::choice(meta_pool_);
     auto meta = meta_weak.lock();
     if (!meta)
-        return ::dungeons::Err<std::shared_ptr<Weapon>>(::dungeons::ErrorCode::INVALID_ARGUMENT, "?????????? ?????? ????? ?? ???????");
+        return ::dungeons::Err<std::shared_ptr<Weapon>>(::dungeons::ErrorCode::INVALID_ARGUMENT, "Выбранный экземпляр метаданных оружия пуст или не существует");
     float multiplier = ::dungeons::Random::next_float(LOWER_MULTIPLIER, UPPER_MULTIPLIER);
     int32_t attack = static_cast<int32_t>(meta->attack_basis() * player.level() * multiplier);
     Attributes attrs = meta->generation_basis() * (player.level() * multiplier);
@@ -23,11 +23,11 @@ namespace dungeons::backend {
 
 ::dungeons::Result<std::shared_ptr<Armor>> ArmorFactory::create_for_player(const Player& player) noexcept {
     if (meta_pool_.empty())
-        return ::dungeons::Err<std::shared_ptr<Armor>>(::dungeons::ErrorCode::VALIDATION_FAILED, "???? ?????????? ????? ????");
+        return ::dungeons::Err<std::shared_ptr<Armor>>(::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных брони пуст");
     auto meta_weak = ::dungeons::Random::choice(meta_pool_);
     auto meta = meta_weak.lock();
     if (!meta)
-        return ::dungeons::Err<std::shared_ptr<Armor>>(::dungeons::ErrorCode::INVALID_ARGUMENT, "?????????? ????? ????? ?? ???????");
+        return ::dungeons::Err<std::shared_ptr<Armor>>(::dungeons::ErrorCode::INVALID_ARGUMENT, "Выбранный экземпляр метаданных брони пуст или не существует");
     float multiplier = ::dungeons::Random::next_float(LOWER_MULTIPLIER, UPPER_MULTIPLIER);
     int32_t defense = static_cast<int32_t>(meta->defense_basis() * player.level() * multiplier);
     Attributes attrs = meta->generation_basis() * (player.level() * multiplier);
@@ -39,11 +39,11 @@ namespace dungeons::backend {
 
 ::dungeons::Result<Enemy> EnemyFactory::create_for_player(const Player& player) noexcept {
     if (meta_pool_.empty())
-        return ::dungeons::Err<Enemy>(::dungeons::ErrorCode::VALIDATION_FAILED, "???? ?????????? ??????????? ????");
+        return ::dungeons::Err<Enemy>(::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных врагов пуст");
     auto meta_weak = ::dungeons::Random::choice(meta_pool_);
     auto meta = meta_weak.lock();
     if (!meta)
-        return ::dungeons::Err<Enemy>(::dungeons::ErrorCode::INVALID_ARGUMENT, "?????????? ?????????? ????? ?? ???????");
+        return ::dungeons::Err<Enemy>(::dungeons::ErrorCode::INVALID_ARGUMENT, "Выбранный экземпляр метаданных пуст или не существует");
     float k = ::dungeons::Random::next_float(K_MIN, K_MAX);
     float generation_basis = meta->generation_basis();
     int32_t enemy_health = static_cast<int32_t>(player.base_max_health() * k * generation_basis);
@@ -70,6 +70,7 @@ namespace dungeons::backend {
     enemy.update_max_health();
     return ::dungeons::Ok(enemy);
 }
+
 
 ::dungeons::Result<std::shared_ptr<Weapon>> WeaponFactory::create_random() noexcept {
     if (meta_pool_.empty())
