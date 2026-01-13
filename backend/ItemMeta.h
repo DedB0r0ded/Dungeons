@@ -52,6 +52,7 @@ namespace dungeons::backend {
         void generation_basis(const Attributes& value) { generation_basis_ = value; }
     };
 
+
     class ArmorMeta : public ItemMeta {
         float defense_basis_;
 
