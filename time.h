@@ -86,12 +86,12 @@ namespace dungeons {
 
 
         // Сеттеры с валидацией
-        Result<void> set_year(uint16_t value) noexcept {
+        Result<void> year(uint16_t value) noexcept {
             year_ = value;
             return validate();
         }
 
-        Result<void> set_month(uint8_t value) noexcept {
+        Result<void> month(uint8_t value) noexcept {
             if (value < 1 || value > 12)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Month must be in range [1, 12]");
@@ -99,7 +99,7 @@ namespace dungeons {
             return Ok();
         }
 
-        Result<void> set_day(uint8_t value) noexcept {
+        Result<void> day(uint8_t value) noexcept {
             if (value < 1 || value > 31)
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Day must be in range [1, 31]");
@@ -107,7 +107,7 @@ namespace dungeons {
             return Ok();
         }
 
-        Result<void> set_hours(uint8_t value) noexcept {
+        Result<void> hours(uint8_t value) noexcept {
             if (value > 23) {
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Hours must be in range [0, 23]");
@@ -122,7 +122,7 @@ namespace dungeons {
             return Ok();
         }
 
-        Result<void> set_minutes(uint8_t value) noexcept {
+        Result<void> minutes(uint8_t value) noexcept {
             if (value > 59) {
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Minutes must be in range [0, 59]");
@@ -137,7 +137,7 @@ namespace dungeons {
             return Ok();
         }
 
-        Result<void> set_seconds(uint8_t value) noexcept {
+        Result<void> seconds(uint8_t value) noexcept {
             if (value > 59) {
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Seconds must be in range [0, 59]");
@@ -152,7 +152,7 @@ namespace dungeons {
             return Ok();
         }
 
-        Result<void> set_milliseconds(uint16_t value) noexcept {
+        Result<void> milliseconds(uint16_t value) noexcept {
             if (value > 999) {
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Milliseconds must be in range [0, 999]");
@@ -167,7 +167,7 @@ namespace dungeons {
             return Ok();
         }
 
-        Result<void> set_milliseconds_from_midnight(uint32_t value) noexcept {
+        Result<void> milliseconds_from_midnight(uint32_t value) noexcept {
             uint32_t max_millis = 86400000 + (leap_second_ ? 1000 : 0);
             if (value >= max_millis)
                 return Err(ErrorCode::VALIDATION_FAILED,
@@ -176,7 +176,7 @@ namespace dungeons {
             return Ok();
         }
 
-        Result<void> set_timezone_offset_minutes(int16_t value) noexcept {
+        Result<void> timezone_offset_minutes(int16_t value) noexcept {
             if (!valid_timezone_offset(value))
                 return Err(ErrorCode::VALIDATION_FAILED,
                     "Timezone offset must be in range [-720, 840] minutes");
@@ -184,11 +184,11 @@ namespace dungeons {
             return Ok();
         }
 
-        void set_leap_second(bool value) noexcept {
+        void leap_second(bool value) noexcept {
             leap_second_ = value ? 1 : 0;
         }
 
-        void set_is_dst(bool value) noexcept {
+        void is_dst(bool value) noexcept {
             is_dst_ = value ? 1 : 0;
         }
 
@@ -285,7 +285,12 @@ namespace dungeons {
         }
 
         static Result<Time> from_time_t(std::time_t t, int16_t tz_offset = 0) {
-            std::tm* tm_info = std::gmtime(&t);
+            auto tm_info = std::make_unique<tm>();
+#ifdef _WIN32
+            gmtime_s(tm_info.get(), &t);
+#else
+            tm_info = std::gmtime(&t);
+#endif
             if (!tm_info)
                 return Err<Time>(ErrorCode::INVALID_ARGUMENT, "Invalid time_t value");
             return from_tm(*tm_info, tz_offset);
@@ -330,14 +335,14 @@ namespace dungeons {
             auto total_micros = std::chrono::duration_cast<std::chrono::microseconds>(
                 duration_since_epoch).count();
             auto micros_in_second = total_micros % 1000000;
-            uint16_t milliseconds_part = micros_in_second / 1000;
+            uint16_t milliseconds_part = static_cast<uint16_t>(micros_in_second / 1000);
             uint16_t microseconds_part = micros_in_second % 1000;
             auto result = from_time_t(t, tz_offset);
             if (!result) {
                 return result;
             }
             Time time = result.value();
-            auto millis_result = time.set_milliseconds(milliseconds_part);
+            auto millis_result = time.milliseconds(milliseconds_part);
             if (!millis_result) {
                 return Err<Time>(millis_result.error().code(),
                     millis_result.error().message());

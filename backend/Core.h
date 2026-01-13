@@ -114,14 +114,15 @@ namespace dungeons::backend {
         // Инициализация репозиториев и индексов
         void initialize() noexcept {
             ::dungeons::Logger::instance().info("Core: инициализация репозиториев и индексов");
-            // Создать репозитории
-            armor_meta_repo_ = std::make_unique<ArmorMetaRepository>();
-            weapon_meta_repo_ = std::make_unique<WeaponMetaRepository>();
-            inventory_repo_ = std::make_unique<InventoryRepository>();
-            player_repo_ = std::make_unique<PlayerRepository>();
-            enemy_meta_repo_ = std::make_unique<EnemyMetaRepository>();
-            location_repo_ = std::make_unique<LocationRepository>();
-            room_repo_ = std::make_unique<RoomRepository>();
+            // Создать репозитории - используем реализации Impl
+            const std::string db_path = data_directory_ + "/game.db";
+            armor_meta_repo_ = std::make_unique<ArmorMetaRepositoryImpl>(db_path);
+            weapon_meta_repo_ = std::make_unique<WeaponMetaRepositoryImpl>(db_path);
+            inventory_repo_ = std::make_unique<InventoryRepositoryImpl>(db_path);
+            player_repo_ = std::make_unique<PlayerRepositoryImpl>(db_path);
+            enemy_meta_repo_ = std::make_unique<EnemyMetaRepositoryImpl>(db_path);
+            location_repo_ = std::make_unique<LocationRepositoryImpl>(db_path);
+            room_repo_ = std::make_unique<RoomRepositoryImpl>(db_path);
             // Создать индексы
             armor_meta_index_ = std::make_unique<ArmorMetaIndex>();
             weapon_meta_index_ = std::make_unique<WeaponMetaIndex>();

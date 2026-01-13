@@ -7,6 +7,7 @@
 #include "./Inventory.h"
 #include "./Enemy.h"
 #include "./backend_base.h"
+#include "./factories.h"
 #include "../Logger.h"
 
 #include <variant>

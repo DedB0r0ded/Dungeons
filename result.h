@@ -16,6 +16,7 @@ namespace dungeons {
         EMPTY_CONTAINER,
         VALIDATION_FAILED,
         INVALID_DIMENSIONS,
+        IO_ERROR,
         EXCEPTION,
         NOT_IMPLEMENTED
     };

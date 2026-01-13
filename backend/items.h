@@ -13,12 +13,22 @@
 
 
 namespace dungeons::backend {
+    
+
+    class IItem {
+    public:
+        virtual std::weak_ptr<ItemMeta> meta() const noexcept = 0;
+        // Add this pure virtual method to provide access to uid
+        virtual const Result<uid_t> uid() const noexcept {
+            auto mt = meta().lock();
+            if (!mt)
+                return Err<uid_t>(ErrorCode::VALIDATION_FAILED, "Метаданные предмета не инициализированы.");
+            return Result(mt->uid());
+        }
+    };
 
 
-    template<typename T>
-    class Item {
-        static_assert(std::is_base_of<ItemMeta, T>::value,
-            "T must derive from ItemMeta");
+    class Item : public IItem {
 
     protected:
         const Money value_;
@@ -26,11 +36,11 @@ namespace dungeons::backend {
         int32_t current_durability_;
         int32_t max_durability_;
         bool breakable_;
-        std::weak_ptr<T> meta_;
+        std::weak_ptr<ItemMeta> meta_;
 
         // Protected конструктор - нельзя инстанцировать напрямую
         Item(const Money& value, const Attributes& attrs,
-            int32_t max_dur, bool breakable, std::weak_ptr<T> meta)
+            int32_t max_dur, bool breakable, std::weak_ptr<ItemMeta> meta)
             : value_(value),
             attributes_(attrs),
             current_durability_(max_dur),
@@ -59,7 +69,7 @@ namespace dungeons::backend {
         int32_t current_durability() const noexcept { return current_durability_; }
         int32_t max_durability() const noexcept { return max_durability_; }
         bool breakable() const noexcept { return breakable_; }
-        std::weak_ptr<T> meta() const noexcept { return meta_; }
+        std::weak_ptr<ItemMeta> meta() const noexcept override { return meta_; }
 
 
         // Сеттеры с валидацией
@@ -132,14 +142,14 @@ namespace dungeons::backend {
     };
 
 
-    class Armor : public Item<ArmorMeta> {
+    class Armor : public Item {
         int32_t defense_;
 
 
     public:
         Armor(const Money& value, const Attributes& attrs, int32_t max_dur,
             bool breakable, std::weak_ptr<ArmorMeta> meta, int32_t defense)
-            : Item<ArmorMeta>(value, attrs, max_dur, breakable, meta),
+            : Item(value, attrs, max_dur, breakable, meta),
             defense_(defense) {
         }
 
@@ -165,7 +175,7 @@ namespace dungeons::backend {
 
         // Validation
         ::dungeons::Result<void> validate() const noexcept {
-            auto base_validation = Item<ArmorMeta>::validate();
+            auto base_validation = Item::validate();
             if (!base_validation)
                 return base_validation;
             if (defense_ < 0)
@@ -175,14 +185,14 @@ namespace dungeons::backend {
     };
 
 
-    class Weapon : public Item<WeaponMeta> {
+    class Weapon : public Item {
         int32_t base_attack_;
 
 
     public:
         Weapon(const Money& value, const Attributes& attrs, int32_t max_dur,
             bool breakable, std::weak_ptr<WeaponMeta> meta, int32_t attack)
-            : Item<WeaponMeta>(value, attrs, max_dur, breakable, meta),
+            : Item(value, attrs, max_dur, breakable, meta),
             base_attack_(attack) {
         }
 
@@ -208,7 +218,7 @@ namespace dungeons::backend {
 
         // Валидация
         ::dungeons::Result<void> validate() const noexcept {
-            auto base_validation = Item<WeaponMeta>::validate();
+            auto base_validation = Item::validate();
             if (!base_validation)
                 return base_validation;
             if (base_attack_ < 0)

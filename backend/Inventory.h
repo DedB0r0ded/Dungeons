@@ -4,7 +4,7 @@
 
 
 #include "./Entity.h"
-#include "./Item.h"
+#include "./items.h"
 #include "./Money.h"
 #include "./backend_base.h"
 
@@ -19,7 +19,7 @@ namespace dungeons::backend {
 
     class BaseInventory {
     protected:
-        std::vector<std::optional<std::shared_ptr<Item<ItemMeta>>>> items_;
+        std::vector<std::optional<std::shared_ptr<IItem>>> items_;
         size_t max_size_;
         Money money_;
 
@@ -73,14 +73,14 @@ namespace dungeons::backend {
 
 
         // Получить предмет по id
-        ::dungeons::Result<std::shared_ptr<Item<ItemMeta>>> get_item(size_t id) const noexcept {
+        ::dungeons::Result<std::shared_ptr<IItem>> get_item(size_t id) const noexcept {
             if (id >= max_size_) {
-                return ::dungeons::Err<std::shared_ptr<Item<ItemMeta>>>(
+                return ::dungeons::Err<std::shared_ptr<IItem>>(
                     ::dungeons::ErrorCode::OUT_OF_RANGE,
                     "Item ID out of range");
             }
             if (!items_[id].has_value()) {
-                return ::dungeons::Err<std::shared_ptr<Item<ItemMeta>>>(
+                return ::dungeons::Err<std::shared_ptr<IItem>>(
                     ::dungeons::ErrorCode::INVALID_ARGUMENT,
                     "Slot is empty");
             }
@@ -95,7 +95,7 @@ namespace dungeons::backend {
 
 
         // Положить предмет в первый свободный слот
-        ::dungeons::Result<size_t> add_item(std::shared_ptr<Item<ItemMeta>> item) noexcept {
+        ::dungeons::Result<size_t> add_item(std::shared_ptr<IItem> item) noexcept {
             if (!item)
                 return ::dungeons::Err<size_t>(::dungeons::ErrorCode::INVALID_ARGUMENT, "Cannot add null item");
             for (size_t i = 0; i < max_size_; ++i) {
@@ -108,7 +108,7 @@ namespace dungeons::backend {
         }
 
         // Положить предмет в конкретный слот
-        ::dungeons::Result<void> add_item_at(std::shared_ptr<Item<ItemMeta>> item, size_t id) noexcept {
+        ::dungeons::Result<void> add_item_at(std::shared_ptr<Item> item, size_t id) noexcept {
             if (!item)
                 return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT, "Cannot add null item");
             if (id >= max_size_)
@@ -181,8 +181,8 @@ namespace dungeons::backend {
         }
 
 
-        std::vector<std::shared_ptr<Item<ItemMeta>>> get_all_items() const noexcept {
-            std::vector<std::shared_ptr<Item<ItemMeta>>> result;
+        std::vector<std::shared_ptr<IItem>> get_all_items() const noexcept {
+            std::vector<std::shared_ptr<IItem>> result;
             for (const auto& item_opt : items_) {
                 if (item_opt.has_value()) {
                     result.push_back(item_opt.value());

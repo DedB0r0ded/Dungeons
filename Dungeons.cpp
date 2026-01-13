@@ -20,7 +20,7 @@ int main()
 	Terminal::set_size(80, 30);
 	auto t = Terminal(std::cout);
 
-	UnicodeCharMatrix chars({ "АБ你", "ГДЕ", "ЁЖЗ" });
+	UnicodeCharMatrix chars({ "АБ你", "ГД\U0001F3AE", "ЁЖЗ" });
 	FrameSnapshot frame(chars, CharStyle(Color::BRIGHT_WHITE, Color::BLACK));
 	frame.set_area_style(0, 0, 2, 0, CharStyle(Color::RED, Color::WHITE));
 	t.put(frame.to_string().value());

@@ -7,15 +7,15 @@
 #pragma once
 
 
+#include "./backend_base.h"
 #include "./Entity.h"
 #include "./Alive.h"
-#include "./Inventory.h"
+#include "./Location.h"
 #include "./Room.h"
+#include "./Inventory.h"
 #include "./Enemy.h"
 #include "./Battle.h"
-#include "./backend_base.h"
 
-#include <memory>
 #include <variant>
 #include <cmath>
 
@@ -109,7 +109,7 @@ namespace dungeons::backend {
             if (!room_ptr)
                 return ::dungeons::Err<std::variant<std::monostate, Inventory, Enemy>>(
                     ::dungeons::ErrorCode::INVALID_ARGUMENT, "Игрок не в комнате");
-            return room_ptr->search();
+            return room_ptr->search(*this);
         }
 
 
@@ -129,7 +129,7 @@ namespace dungeons::backend {
                 power_ratio = static_cast<float>(player_power) / static_cast<float>(enemy_power);
             }
             else {
-                power_ratio = 9999.999;
+                power_ratio = 999.625f;
             }
             // Определить состояние битвы
             BattleState state;

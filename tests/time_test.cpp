@@ -121,7 +121,7 @@ TEST_F(TimeTest, TimeComponents_ArbitraryTime) {
 
 TEST_F(TimeTest, SetMillisecondsFromMidnight_Valid) {
     Time t;
-    auto result = t.set_milliseconds_from_midnight(45296789);
+    auto result = t.milliseconds_from_midnight(45296789);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.hours(), 12);
     EXPECT_EQ(t.minutes(), 34);
@@ -131,24 +131,24 @@ TEST_F(TimeTest, SetMillisecondsFromMidnight_Valid) {
 
 TEST_F(TimeTest, SetMillisecondsFromMidnight_Invalid) {
     Time t;
-    auto result = t.set_milliseconds_from_midnight(86400000);
+    auto result = t.milliseconds_from_midnight(86400000);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
 }
 
 TEST_F(TimeTest, SetLeapSecond) {
     Time t;
-    t.set_leap_second(true);
+    t.leap_second(true);
     EXPECT_TRUE(t.leap_second());
-    t.set_leap_second(false);
+    t.leap_second(false);
     EXPECT_FALSE(t.leap_second());
 }
 
 TEST_F(TimeTest, SetIsDst) {
     Time t;
-    t.set_is_dst(true);
+    t.is_dst(true);
     EXPECT_TRUE(t.is_dst());
-    t.set_is_dst(false);
+    t.is_dst(false);
     EXPECT_FALSE(t.is_dst());
 }
 
@@ -189,7 +189,7 @@ TEST_F(TimeTest, SetHours_Valid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_hours(18);
+    auto result = t.hours(18);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.hours(), 18);
     EXPECT_EQ(t.minutes(), 34);
@@ -202,7 +202,7 @@ TEST_F(TimeTest, SetHours_Invalid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_hours(24);
+    auto result = t.hours(24);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
     EXPECT_EQ(t.hours(), 12); // Должно остаться прежнее значение
@@ -213,11 +213,11 @@ TEST_F(TimeTest, SetHours_Boundary) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_hours(0);
+    auto result = t.hours(0);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.hours(), 0);
 
-    result = t.set_hours(23);
+    result = t.hours(23);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.hours(), 23);
 }
@@ -227,7 +227,7 @@ TEST_F(TimeTest, SetMinutes_Valid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_minutes(45);
+    auto result = t.minutes(45);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.hours(), 12);
     EXPECT_EQ(t.minutes(), 45);
@@ -240,7 +240,7 @@ TEST_F(TimeTest, SetMinutes_Invalid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_minutes(60);
+    auto result = t.minutes(60);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
     EXPECT_EQ(t.minutes(), 34);
@@ -251,11 +251,11 @@ TEST_F(TimeTest, SetMinutes_Boundary) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_minutes(0);
+    auto result = t.minutes(0);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.minutes(), 0);
 
-    result = t.set_minutes(59);
+    result = t.minutes(59);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.minutes(), 59);
 }
@@ -265,7 +265,7 @@ TEST_F(TimeTest, SetSeconds_Valid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_seconds(30);
+    auto result = t.seconds(30);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.hours(), 12);
     EXPECT_EQ(t.minutes(), 34);
@@ -278,7 +278,7 @@ TEST_F(TimeTest, SetSeconds_Invalid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_seconds(60);
+    auto result = t.seconds(60);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
     EXPECT_EQ(t.seconds(), 56);
@@ -289,11 +289,11 @@ TEST_F(TimeTest, SetSeconds_Boundary) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_seconds(0);
+    auto result = t.seconds(0);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.seconds(), 0);
 
-    result = t.set_seconds(59);
+    result = t.seconds(59);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.seconds(), 59);
 }
@@ -303,7 +303,7 @@ TEST_F(TimeTest, SetMilliseconds_Valid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_milliseconds(123);
+    auto result = t.milliseconds(123);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.hours(), 12);
     EXPECT_EQ(t.minutes(), 34);
@@ -316,7 +316,7 @@ TEST_F(TimeTest, SetMilliseconds_Invalid) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_milliseconds(1000);
+    auto result = t.milliseconds(1000);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
     EXPECT_EQ(t.milliseconds(), 789);
@@ -327,11 +327,11 @@ TEST_F(TimeTest, SetMilliseconds_Boundary) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    auto result = t.set_milliseconds(0);
+    auto result = t.milliseconds(0);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.milliseconds(), 0);
 
-    result = t.set_milliseconds(999);
+    result = t.milliseconds(999);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.milliseconds(), 999);
 }
@@ -341,10 +341,10 @@ TEST_F(TimeTest, SetMultipleComponents) {
     ASSERT_TRUE(create_result.is_ok());
     auto t = create_result.value();
 
-    EXPECT_TRUE(t.set_hours(15).is_ok());
-    EXPECT_TRUE(t.set_minutes(30).is_ok());
-    EXPECT_TRUE(t.set_seconds(45).is_ok());
-    EXPECT_TRUE(t.set_milliseconds(500).is_ok());
+    EXPECT_TRUE(t.hours(15).is_ok());
+    EXPECT_TRUE(t.minutes(30).is_ok());
+    EXPECT_TRUE(t.seconds(45).is_ok());
+    EXPECT_TRUE(t.milliseconds(500).is_ok());
 
     EXPECT_EQ(t.hours(), 15);
     EXPECT_EQ(t.minutes(), 30);
@@ -358,14 +358,14 @@ TEST_F(TimeTest, SetComponents_PreserveOthers) {
     auto t = create_result.value();
 
     // Изменяем только часы
-    EXPECT_TRUE(t.set_hours(20).is_ok());
+    EXPECT_TRUE(t.hours(20).is_ok());
     EXPECT_EQ(t.hours(), 20);
     EXPECT_EQ(t.minutes(), 34);
     EXPECT_EQ(t.seconds(), 56);
     EXPECT_EQ(t.milliseconds(), 789);
 
     // Изменяем только минуты
-    EXPECT_TRUE(t.set_minutes(15).is_ok());
+    EXPECT_TRUE(t.minutes(15).is_ok());
     EXPECT_EQ(t.hours(), 20);
     EXPECT_EQ(t.minutes(), 15);
     EXPECT_EQ(t.seconds(), 56);
@@ -374,42 +374,42 @@ TEST_F(TimeTest, SetComponents_PreserveOthers) {
 
 TEST_F(TimeTest, SetMonth_Valid) {
     Time t;
-    auto result = t.set_month(6);
+    auto result = t.month(6);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.month(), 6);
 }
 
 TEST_F(TimeTest, SetMonth_Invalid) {
     Time t;
-    auto result = t.set_month(13);
+    auto result = t.month(13);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
 }
 
 TEST_F(TimeTest, SetDay_Valid) {
     Time t;
-    auto result = t.set_day(15);
+    auto result = t.day(15);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.day(), 15);
 }
 
 TEST_F(TimeTest, SetDay_Invalid) {
     Time t;
-    auto result = t.set_day(32);
+    auto result = t.day(32);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
 }
 
 TEST_F(TimeTest, SetTimezoneOffset_Valid) {
     Time t;
-    auto result = t.set_timezone_offset_minutes(180);
+    auto result = t.timezone_offset_minutes(180);
     EXPECT_TRUE(result.is_ok());
     EXPECT_EQ(t.timezone_offset_minutes(), 180);
 }
 
 TEST_F(TimeTest, SetTimezoneOffset_Invalid) {
     Time t;
-    auto result = t.set_timezone_offset_minutes(1000);
+    auto result = t.timezone_offset_minutes(1000);
     EXPECT_TRUE(result.is_error());
     EXPECT_EQ(result.error().code(), ErrorCode::VALIDATION_FAILED);
 }
