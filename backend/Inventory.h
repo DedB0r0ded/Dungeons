@@ -3,13 +3,11 @@
 #pragma once
 
 
+#include "./backend_base.h"
 #include "./Entity.h"
 #include "./items.h"
 #include "./Money.h"
-#include "./backend_base.h"
 
-#include <vector>
-#include <memory>
 #include <optional>
 #include <algorithm>
 
@@ -248,7 +246,7 @@ namespace dungeons::backend {
             if (!base_validation)
                 return base_validation;
             if (!uid_.is_inventory())
-                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Inventory must have IS_INVENTORY flag");
+                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Экземпляр Inventory должен иметь IS_INVENTORY флаг");
             return ::dungeons::Ok();
         }
     };

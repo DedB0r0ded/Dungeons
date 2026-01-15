@@ -1,10 +1,10 @@
 // Location.h
 #pragma once
 
+
+#include "./backend_base.h"
 #include "./Entity.h"
-#include "../result.h"
-#include <string>
-#include <memory>
+
 
 namespace dungeons::backend {
 

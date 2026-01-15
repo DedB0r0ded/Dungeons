@@ -24,12 +24,9 @@ int main()
 	FrameSnapshot frame(chars, CharStyle(Color::BRIGHT_WHITE, Color::BLACK));
 	frame.set_area_style(0, 0, 2, 0, CharStyle(Color::RED, Color::WHITE));
 	t.put(frame.to_string().value());
-	dungeons::Time a = dungeons::Time::now().value();
-	t.put("\033[0m");
 	t.print();
-	a.move_to_timezone(480);
-	t.putln(std::to_string(dungeons::Random::next_double()));
-	t.putln(a.to_string());
-	t.print();
+
+
+
 	return 0;
 }

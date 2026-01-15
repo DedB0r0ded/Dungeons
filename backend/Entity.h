@@ -2,13 +2,10 @@
 #pragma once
 
 
-#include "./uid.h"
-#include "../result.h"
+#include "./backend_base.h"
 
 
 namespace dungeons::backend {
-
-
     class Entity {
     protected:
         uid_t uid_;
@@ -21,8 +18,7 @@ namespace dungeons::backend {
         explicit Entity(const uid_t& uid) noexcept : uid_(uid) {}
 
         Entity(uint32_t seed_id, UidFlags flags) noexcept
-            : uid_(uid_t::generate(seed_id, flags)) {
-        }
+            : uid_(uid_t::generate(seed_id, flags)) { }
 
 
         // Правило пяти
@@ -37,6 +33,4 @@ namespace dungeons::backend {
         const uid_t& uid() const noexcept { return uid_; }
         void uid(const uid_t& value) noexcept { uid_ = value; }
     };
-
-
 } // namespace dungeons::backend
