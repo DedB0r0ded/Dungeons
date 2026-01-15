@@ -1,11 +1,10 @@
 // factories.cpp
-
 #include "factories.h"
-#include "Player.h"
+
 
 namespace dungeons::backend {
-
-::dungeons::Result<std::shared_ptr<Weapon>> WeaponFactory::create_for_player(const Player& player) noexcept {
+    
+dungeons::Result<std::shared_ptr<Weapon>> WeaponFactory::create_for_player(const PlayerAliveComponent& player) const noexcept {
     if (meta_pool_.empty())
         return ::dungeons::Err<std::shared_ptr<Weapon>>(::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных оружия пуст");
     auto meta_weak = ::dungeons::Random::choice(meta_pool_);
@@ -21,7 +20,7 @@ namespace dungeons::backend {
     return ::dungeons::Ok(weapon);
 }
 
-::dungeons::Result<std::shared_ptr<Armor>> ArmorFactory::create_for_player(const Player& player) noexcept {
+dungeons::Result<std::shared_ptr<Armor>> ArmorFactory::create_for_player(const PlayerAliveComponent& player) const noexcept {
     if (meta_pool_.empty())
         return ::dungeons::Err<std::shared_ptr<Armor>>(::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных брони пуст");
     auto meta_weak = ::dungeons::Random::choice(meta_pool_);
@@ -37,7 +36,7 @@ namespace dungeons::backend {
     return ::dungeons::Ok(armor);
 }
 
-::dungeons::Result<Enemy> EnemyFactory::create_for_player(const Player& player) noexcept {
+dungeons::Result<Enemy> EnemyFactory::create_for_player(const PlayerAliveComponent& player) const noexcept {
     if (meta_pool_.empty())
         return ::dungeons::Err<Enemy>(::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных врагов пуст");
     auto meta_weak = ::dungeons::Random::choice(meta_pool_);
@@ -72,7 +71,7 @@ namespace dungeons::backend {
 }
 
 
-::dungeons::Result<std::shared_ptr<Weapon>> WeaponFactory::create_random() noexcept {
+dungeons::Result<std::shared_ptr<Weapon>> WeaponFactory::create_random() const noexcept {
     if (meta_pool_.empty())
         return ::dungeons::Err<std::shared_ptr<Weapon>>(
             ::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных оружия пуст");
@@ -91,7 +90,7 @@ namespace dungeons::backend {
 }
 
 
-::dungeons::Result<std::shared_ptr<Armor>> ArmorFactory::create_random() noexcept {
+dungeons::Result<std::shared_ptr<Armor>> ArmorFactory::create_random() const noexcept {
     if (meta_pool_.empty())
         return ::dungeons::Err<std::shared_ptr<Armor>>(
             ::dungeons::ErrorCode::VALIDATION_FAILED, "Пулл метаданных брони пуст");
@@ -110,7 +109,7 @@ namespace dungeons::backend {
 }
 
 
-::dungeons::backend::Inventory InventoryFactory::create_treasure(size_t room_id) noexcept {
+dungeons::backend::Inventory InventoryFactory::create_treasure(size_t room_id) const noexcept {
     int32_t item_count = ::dungeons::Random::next_int<int32_t>(TREASURE_MIN_ITEMS, TREASURE_MAX_ITEMS);
     int64_t money_amount = TREASURE_MONEY_BASIS * static_cast<int64_t>(room_id);
     Money money(money_amount);
@@ -132,7 +131,7 @@ namespace dungeons::backend {
     return inventory;
 }
 
-::dungeons::backend::Inventory InventoryFactory::create_enemy_loot(size_t room_id) noexcept {
+dungeons::backend::Inventory InventoryFactory::create_enemy_loot(size_t room_id) const noexcept {
     int64_t money_amount = ENEMY_MONEY_BASIS * static_cast<int64_t>(room_id);
     Money money(money_amount);
     Inventory inventory(10, money);

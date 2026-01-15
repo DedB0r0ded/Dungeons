@@ -44,12 +44,11 @@ add_executable(Dungeons
     "backend/Location.h"  
     "backend/factories.h" 
     "backend/Room.h" 
-    "backend/Room.cpp"
      
     "backend/items.h" 
     "backend/Alive.h" 
-    "backend/Player.h" 
-    "backend/Battle.h" 
+    "backend/player/Player.h" 
+    "backend/player/Battle.h" 
     "backend/indexes.h" 
     "backend/Achivement.h" 
     "backend/meta/ItemMeta.h" 
@@ -59,6 +58,11 @@ add_executable(Dungeons
     #"backend/repositories.h" 
     #"backend/Core.h"
     
+    "backend/player/PlayerEntityComponent.h" 
+    "backend/player/PlayerAliveComponent.h"
+    "backend/factories.cpp"
+    "backend/Room.cpp"
+    "backend/player/Player.cpp" 
      
     "backend/EventLoop.h"
     

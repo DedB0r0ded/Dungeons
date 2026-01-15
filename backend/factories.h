@@ -3,21 +3,13 @@
 
 
 #include "backend_base.h"
-#include "ItemMeta.h"
 #include "items.h"
 #include "Inventory.h"
 #include "Enemy.h"
-#include "Location.h"
-#include "Room.h"
-
-#include <vector>
-#include <memory>
+#include "player/PlayerAliveComponent.h"
 
 
 namespace dungeons::backend {
-
-
-    class Player;
 
 
     class WeaponFactory {
@@ -50,10 +42,10 @@ namespace dungeons::backend {
 
 
         // Создать случайное оружие
-        ::dungeons::Result<std::shared_ptr<Weapon>> create_random() noexcept;
+        dungeons::Result<std::shared_ptr<Weapon>> create_random() const noexcept;
 
         // Создать оружие для игрока (масштабируется по уровню)
-        ::dungeons::Result<std::shared_ptr<Weapon>> create_for_player(const Player& player) noexcept;
+        dungeons::Result<std::shared_ptr<Weapon>> create_for_player(const PlayerAliveComponent& player) const noexcept;
     };
 
 
@@ -87,10 +79,10 @@ namespace dungeons::backend {
 
 
         // Создать случайную броню
-        ::dungeons::Result<std::shared_ptr<Armor>> create_random() noexcept;
+        dungeons::Result<std::shared_ptr<Armor>> create_random() const  noexcept;
 
         // Создать броню для игрока (масштабируется по уровню)
-        ::dungeons::Result<std::shared_ptr<Armor>> create_for_player(const Player& player) noexcept;
+        dungeons::Result<std::shared_ptr<Armor>> create_for_player(const PlayerAliveComponent& player) const noexcept;
     };
 
 
@@ -132,10 +124,10 @@ namespace dungeons::backend {
 
     
         // Создать инвентарь сокровищ
-        Inventory create_treasure(size_t room_id) noexcept;
+        Inventory create_treasure(size_t room_id) const noexcept;
 
         // Создать инвентарь добычи противника
-        Inventory create_enemy_loot(size_t room_id) noexcept;
+        Inventory create_enemy_loot(size_t room_id) const noexcept;
     };
 
 
@@ -179,7 +171,7 @@ namespace dungeons::backend {
         void meta_pool(const std::vector<std::weak_ptr<EnemyMeta>>& pool) noexcept { meta_pool_ = pool; }
 
         // Создать врага для игрока
-        ::dungeons::Result<Enemy> create_for_player(const Player& player) noexcept;
+        dungeons::Result<Enemy> create_for_player(const PlayerAliveComponent& player) const noexcept;
     };
 
 } // namespace dungeons::backend

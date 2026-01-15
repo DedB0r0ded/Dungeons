@@ -28,6 +28,7 @@ namespace dungeons::backend {
 
     public:
         // Алиасы
+        using search_res_t_inner = std::variant<std::monostate, dungeons::backend::Inventory, dungeons::backend::Enemy>;
         using search_res_t = dungeons::Result<std::variant<std::monostate, dungeons::backend::Inventory, dungeons::backend::Enemy>>;
         
         
@@ -92,11 +93,16 @@ namespace dungeons::backend {
         void next_room(std::weak_ptr<Room> value) noexcept { next_room_ = value; }
 
 
-        dungeons::Result<std::variant<std::monostate, Inventory, Enemy>> search(const class Player& player) noexcept;
+        search_res_t nothing_found();
+        search_res_t treasure_found(const Location& location_ptr);
+        search_res_t enemy_found(const Location& location_ptr, const PlayerAliveComponent& player);
+        dungeons::Result<std::variant<std::monostate, Inventory, Enemy>> search(const PlayerAliveComponent& player) noexcept;
      
 
         // Валидация
         dungeons::Result<void> validate() const noexcept;
+        dungeons::Result<void> validate_action_counter() const noexcept;
+        dungeons::Result<void> validate_location(const std::shared_ptr<Location> p) const noexcept;
     };
 
 

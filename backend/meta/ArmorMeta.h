@@ -1,5 +1,5 @@
 // ArmorMeta.h
-#pragma ocne
+#pragma once
 
 
 #include "ItemMeta.h"
