@@ -3,6 +3,8 @@
 
 // API стандартной библиотеки
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 
 // Платформозависимые файлы
@@ -14,7 +16,9 @@
 // Исходники проекта
 #include "./time.h"
 #include "./Random.h"
-//#include "./backend/Core.h"
+
+
+
 #include "./tui/Terminal.h"
 #include "./tui/UnicodeCharMatrix.h"
 #include "./tui/StyleMatrix.h"

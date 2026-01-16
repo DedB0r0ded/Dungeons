@@ -12,6 +12,8 @@
 #include "./meta/EnemyMeta.h"
 #include "./Inventory.h"
 #include "./Location.h"
+#include "./Room.h"
+#include "./player/Player.h"
 
 #include <unordered_map>
 #include <type_traits>

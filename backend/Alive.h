@@ -100,29 +100,23 @@ namespace dungeons::backend {
         void name(const std::string& value) noexcept { name_ = value; }
 
         ::dungeons::Result<void> level(int32_t value) noexcept {
-            if (value < 1) {
-                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED,
-                    "Level must be at least 1");
-            }
+            if (value < 1)
+                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Level must be at least 1");
             level_ = value;
             required_experience_ = calculate_required_experience(level_);
             return ::dungeons::Ok();
         }
 
         ::dungeons::Result<void> experience(int64_t value) noexcept {
-            if (value < 0) {
-                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED,
-                    "Experience cannot be negative");
-            }
+            if (value < 0)
+                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Experience cannot be negative");
             experience_ = value;
             return ::dungeons::Ok();
         }
 
         ::dungeons::Result<void> current_health(int32_t value) noexcept {
-            if (value < 0) {
-                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED,
-                    "Health cannot be negative");
-            }
+            if (value < 0)
+                return ::dungeons::Err(::dungeons::ErrorCode::VALIDATION_FAILED, "Health cannot be negative");
             current_health_ = value;
             return ::dungeons::Ok();
         }
@@ -224,11 +218,8 @@ namespace dungeons::backend {
 
         // Add experience
         ::dungeons::Result<void> add_experience(int64_t amount) noexcept {
-            if (amount < 0) {
-                return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT,
-                    "Experience amount cannot be negative");
-            }
-
+            if (amount < 0)
+                return ::dungeons::Err(::dungeons::ErrorCode::INVALID_ARGUMENT, "Experience amount cannot be negative");
             experience_ += amount;
             return ::dungeons::Ok();
         }

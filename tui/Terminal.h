@@ -82,7 +82,7 @@ namespace dungeons::tui {
         }
 
         // Установить размер окна терминала (только в символах)
-        static bool set_size(int width, int height) {
+        static bool set_size(int height, int width) {
 #ifdef _WIN32
             HANDLE hConsole = g_hConsoleOut;
             if (hConsole == INVALID_HANDLE_VALUE)

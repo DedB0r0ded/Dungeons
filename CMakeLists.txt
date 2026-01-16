@@ -49,12 +49,12 @@ add_executable(Dungeons
     "backend/Alive.h" 
     "backend/player/Player.h" 
     "backend/player/Battle.h" 
-    "backend/indexes.h" 
     "backend/Achivement.h" 
     "backend/meta/ItemMeta.h" 
     "backend/meta/ArmorMeta.h" 
     "backend/meta/WeaponMeta.h" 
     "backend/meta/EnemyMeta.h"
+    "backend/indexes.h" 
     #"backend/repositories.h" 
     #"backend/Core.h"
     

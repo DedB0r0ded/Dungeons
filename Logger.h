@@ -6,8 +6,8 @@
 #include <mutex>
 #include <thread>
 #include <vector>
-#include "../time.h"
-#include "../result.h"
+#include "./time.h"
+#include "./result.h"
 
 namespace dungeons {
 
